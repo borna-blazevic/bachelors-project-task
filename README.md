@@ -1,6 +1,6 @@
 The project can be run with:
 ```
-qemu-system-arm -machine lm3s811evb -kernel gcc/RTOSDemo.bin -s -S
+qemu-system-arm -machine lm3s811evb -serial stdio -kernel gcc/RTOSDemo.bin -s -S
 ```
 
 and can be debbuged with 
