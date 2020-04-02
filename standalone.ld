@@ -26,6 +26,7 @@
  *
  *****************************************************************************/
 
+/*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"
 MEMORY
 {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 64K
@@ -35,26 +36,35 @@ MEMORY
 SECTIONS
 {
     .text :
-    {
-        KEEP(*(.isr_vector))
-        *(.text)
-        *(.rodata*)
-        _etext = .;
-    } > FLASH
+{
+KEEP(*(.isr_vector))
+    *(.text)
+    *(.rodata*)
+    _etext = .;
+} > FLASH
 
-    .data : AT (ADDR(.text) + SIZEOF(.text))
-    {
-        _data = .;
-        *(vtable)
-        *(.data)
-        _edata = .;
-    } > SRAM
+/* .data : AT (ADDR(.text) + SIZEOF(.text)) */
+.ARM.exidx :
+{
+    *(.ARM.exidx*)
+    *(.gnu.linkonce.armexidx.*)
+} > FLASH
 
-    .bss :
-    {
-        _bss = .;
-        *(.bss)
-        *(COMMON)
-        _ebss = .;
-    } > SRAM
+_begin_data = .;
+
+.data : AT ( _begin_data )
+{
+    _data = .;
+    *(vtable)
+    *(.data)
+    _edata = .;
+} > SRAM
+
+.bss :
+{
+    _bss = .;
+    *(.bss)
+    *(COMMON)
+    _ebss = .;
+} > SRAM
 }
