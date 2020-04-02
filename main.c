@@ -26,45 +26,6 @@
  */
 
 
-/*
- * This project contains an application demonstrating the use of the
- * FreeRTOS.org mini real time scheduler on the Luminary Micro LM3S811 Eval
- * board.  See http://www.FreeRTOS.org for more information.
- *
- * main() simply sets up the hardware, creates all the demo application tasks,
- * then starts the scheduler.  http://www.freertos.org/a00102.html provides
- * more information on the standard demo tasks.
- *
- * In addition to a subset of the standard demo application tasks, main.c also
- * defines the following tasks:
- *
- * + A 'Print' task.  The print task is the only task permitted to access the
- * LCD - thus ensuring mutual exclusion and consistent access to the resource.
- * Other tasks do not access the LCD directly, but instead send the text they
- * wish to display to the print task.  The print task spends most of its time
- * blocked - only waking when a message is queued for display.
- *
- * + A 'Button handler' task.  The eval board contains a user push button that
- * is configured to generate interrupts.  The interrupt handler uses a
- * semaphore to wake the button handler task - demonstrating how the priority
- * mechanism can be used to defer interrupt processing to the task level.  The
- * button handler task sends a message both to the LCD (via the print task) and
- * the UART where it can be viewed using a dumb terminal (via the UART to USB
- * converter on the eval board).  NOTES:  The dumb terminal must be closed in
- * order to reflash the microcontroller.  A very basic interrupt driven UART
- * driver is used that does not use the FIFO.  19200 baud is used.
- *
- * + A 'check' task.  The check task only executes every five seconds but has a
- * high priority so is guaranteed to get processor time.  Its function is to
- * check that all the other tasks are still operational and that no errors have
- * been detected at any time.  If no errors have every been detected 'PASS' is
- * written to the display (via the print task) - if an error has ever been
- * detected the message is changed to 'FAIL'.  The position of the message is
- * changed for each write.
- */
-
-
-
 /* Environment includes. */
 #include "DriverLib.h"
 
@@ -75,60 +36,21 @@
 #include "semphr.h"
 
 /* Delay between cycles of the 'check' task. */
-#define mainCHECK_DELAY						( ( TickType_t ) 5000 / portTICK_PERIOD_MS )
 #define mainUART_DELAY						( ( TickType_t ) 10000 / portTICK_PERIOD_MS )
 
 /* UART configuration - note this does not use the FIFO so is not very
 efficient. */
 #define mainBAUD_RATE				( 19200 )
 #define mainFIFO_SET				( 0x10 )
-
-/* Demo task priorities. */
-#define mainQUEUE_POLL_PRIORITY		( tskIDLE_PRIORITY + 2 )
-#define mainCHECK_TASK_PRIORITY		( tskIDLE_PRIORITY + 3 )
-#define mainSEM_TEST_PRIORITY		( tskIDLE_PRIORITY + 1 )
-#define mainBLOCK_Q_PRIORITY		( tskIDLE_PRIORITY + 2 )
-
-/* Demo board specifics. */
-#define mainPUSH_BUTTON             GPIO_PIN_4
-
-/* Misc. */
-#define mainQUEUE_SIZE				( 3 )
-#define mainDEBOUNCE_DELAY			( ( TickType_t ) 150 / portTICK_PERIOD_MS )
-#define mainNO_DELAY				( ( TickType_t ) 0 )
 /*
  * Configure the processor and peripherals for this demo.
  */
 static void prvSetupHardware( void );
-
-/*
- * The 'check' task, as described at the top of this file.
- */
-static void vCheckTask( void *pvParameters );
-
-/*
- * The task that is woken by the ISR that processes GPIO interrupts originating
- * from the push button.
- */
-static void vButtonHandlerTask( void *pvParameters );
-
-/*
- * The task that controls access to the LCD.
- */
-static void vPrintTask( void *pvParameter );
-
 static void vUARTTask( void *pvParameter );
 
 /* String that is transmitted on the UART. */
 static char *cMessage = "Hello world";
 static volatile char *pcNextChar;
-
-/* The semaphore used to wake the button handler task from within the GPIO
-interrupt handler. */
-SemaphoreHandle_t xButtonSemaphore;
-
-/* The queue used to send strings to the print task for display on the LCD. */
-QueueHandle_t xPrintQueue;
 
 /*-----------------------------------------------------------*/
 
@@ -137,19 +59,7 @@ int main( void )
 	/* Configure the clocks, UART and GPIO. */
 	prvSetupHardware();
 
-	/* Create the semaphore used to wake the button handler task from the GPIO
-	ISR. */
-	vSemaphoreCreateBinary( xButtonSemaphore );
-	xSemaphoreTake( xButtonSemaphore, 0 );
-
-	/* Create the queue used to pass message to vPrintTask. */
-	xPrintQueue = xQueueCreate( mainQUEUE_SIZE, sizeof( char * ) );
-
-	xTaskCreate(vUARTTask, "UART", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY + 1, NULL);
-	/* Start the tasks defined within the file. */
-	xTaskCreate( vCheckTask, "Check", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY, NULL );
-	//xTaskCreate( vButtonHandlerTask, "Status", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY + 1, NULL );
-	xTaskCreate( vPrintTask, "Print", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY - 1, NULL );
+	xTaskCreate(vUARTTask, "UART", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
 	/* Start the scheduler. */
 	vTaskStartScheduler();
@@ -158,37 +68,6 @@ int main( void )
 	scheduler. */
 
 	return 0;
-}
-/*-----------------------------------------------------------*/
-
-static void vCheckTask( void *pvParameters )
-{
-portBASE_TYPE xErrorOccurred = pdFALSE;
-TickType_t xLastExecutionTime;
-const char *pcPassMessage = "PASS";
-const char *pcFailMessage = "FAIL";
-
-	/* Initialise xLastExecutionTime so the first call to vTaskDelayUntil()
-	works correctly. */
-	xLastExecutionTime = xTaskGetTickCount();
-
-	for( ;; )
-	{
-		/* Perform this check every mainCHECK_DELAY milliseconds. */
-		vTaskDelayUntil( &xLastExecutionTime, mainCHECK_DELAY );
-
-		/* Send either a pass or fail message.  If an error is found it is
-		never cleared again.  We do not write directly to the LCD, but instead
-		queue a message for display by the print task. */
-		if( xErrorOccurred == pdTRUE )
-		{
-			xQueueSend( xPrintQueue, &pcFailMessage, portMAX_DELAY );
-		}
-		else
-		{
-			xQueueSend( xPrintQueue, &pcPassMessage, portMAX_DELAY );
-		}
-	}
 }
 /*-----------------------------------------------------------*/
 
@@ -216,12 +95,6 @@ static void prvSetupHardware( void )
 	HWREG( UART0_BASE + UART_O_IM ) |= UART_INT_TX;
 	IntPrioritySet( INT_UART0, configKERNEL_INTERRUPT_PRIORITY );
 	IntEnable( INT_UART0 );
-
-
-	/* Initialise the LCD> */
-    OSRAMInit( false );
-    OSRAMStringDraw("www.FreeRTOS.org", 0, 0);
-	OSRAMStringDraw("LM3S811 demo", 16, 1);
 }
 
 static void vUARTTask( void *pvParameters )
@@ -276,22 +149,3 @@ unsigned long ulStatus;
 		}
 	}
 }
-
-static void vPrintTask( void *pvParameters )
-{
-char *pcMessage;
-unsigned portBASE_TYPE uxLine = 0, uxRow = 0;
-
-	for( ;; )
-	{
-		/* Wait for a message to arrive. */
-		xQueueReceive( xPrintQueue, &pcMessage, portMAX_DELAY );
-
-		/* Write the message to the LCD. */
-		uxRow++;
-		uxLine++;
-		OSRAMClear();
-		OSRAMStringDraw( pcMessage, uxLine & 0x3f, uxRow & 0x01);
-	}
-}
-
