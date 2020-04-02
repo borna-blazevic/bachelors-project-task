@@ -74,12 +74,6 @@
 #include "queue.h"
 #include "semphr.h"
 
-/* Demo app includes. */
-#include "integer.h"
-#include "PollQ.h"
-#include "semtest.h"
-#include "BlockQ.h"
-
 /* Delay between cycles of the 'check' task. */
 #define mainCHECK_DELAY						( ( TickType_t ) 5000 / portTICK_PERIOD_MS )
 #define mainUART_DELAY						( ( TickType_t ) 10000 / portTICK_PERIOD_MS )
@@ -151,12 +145,6 @@ int main( void )
 	/* Create the queue used to pass message to vPrintTask. */
 	xPrintQueue = xQueueCreate( mainQUEUE_SIZE, sizeof( char * ) );
 
-	/* Start the standard demo tasks. */
-	vStartIntegerMathTasks( tskIDLE_PRIORITY );
-	vStartPolledQueueTasks( mainQUEUE_POLL_PRIORITY );
-	vStartSemaphoreTasks( mainSEM_TEST_PRIORITY );
-	vStartBlockingQueueTasks( mainBLOCK_Q_PRIORITY );
-
 	xTaskCreate(vUARTTask, "UART", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY + 1, NULL);
 	/* Start the tasks defined within the file. */
 	xTaskCreate( vCheckTask, "Check", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY, NULL );
@@ -189,28 +177,6 @@ const char *pcFailMessage = "FAIL";
 		/* Perform this check every mainCHECK_DELAY milliseconds. */
 		vTaskDelayUntil( &xLastExecutionTime, mainCHECK_DELAY );
 
-		/* Has an error been found in any task? */
-
-		if( xAreIntegerMathsTaskStillRunning() != pdTRUE )
-		{
-			xErrorOccurred = pdTRUE;
-		}
-	
-		if( xArePollingQueuesStillRunning() != pdTRUE )
-		{
-			xErrorOccurred = pdTRUE;
-		}
-	
-		if( xAreSemaphoreTasksStillRunning() != pdTRUE )
-		{
-			xErrorOccurred = pdTRUE;
-		}
-
-		if( xAreBlockingQueuesStillRunning() != pdTRUE )
-		{
-			xErrorOccurred = pdTRUE;
-		}
-
 		/* Send either a pass or fail message.  If an error is found it is
 		never cleared again.  We do not write directly to the LCD, but instead
 		queue a message for display by the print task. */
@@ -230,16 +196,6 @@ static void prvSetupHardware( void )
 {
 	/* Setup the PLL. */
 	SysCtlClockSet( SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_6MHZ );
-
-	/* Setup the push button. */
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
-    GPIODirModeSet(GPIO_PORTC_BASE, mainPUSH_BUTTON, GPIO_DIR_MODE_IN);
-	GPIOIntTypeSet( GPIO_PORTC_BASE, mainPUSH_BUTTON,GPIO_FALLING_EDGE );
-	IntPrioritySet( INT_GPIOC, configKERNEL_INTERRUPT_PRIORITY );
-	GPIOPinIntEnable( GPIO_PORTC_BASE, mainPUSH_BUTTON );
-	IntEnable( INT_GPIOC );
-
-
 
 	/* Enable the UART.  */
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
@@ -293,40 +249,6 @@ static void vUARTTask( void *pvParameters )
 		vTaskDelay( mainUART_DELAY );
 	}
 }
-/*-----------------------------------------------------------*/
-
-static void vButtonHandlerTask( void *pvParameters )
-{
-const char *pcInterruptMessage = "Int";
-
-	for( ;; )
-	{
-		/* Wait for a GPIO interrupt to wake this task. */
-		//while( xSemaphoreTake( xButtonSemaphore, portMAX_DELAY ) != pdPASS );
-
-		/* Start the Tx of the message on the UART. */
-		UARTIntDisable( UART0_BASE, UART_INT_TX );
-		{
-			pcNextChar = cMessage;
-
-			/* Send the first character. */
-			if( !( HWREG( UART0_BASE + UART_O_FR ) & UART_FR_TXFF ) )
-			{
-				HWREG( UART0_BASE + UART_O_DR ) = *pcNextChar;
-			}
-
-			pcNextChar++;
-		}
-		UARTIntEnable(UART0_BASE, UART_INT_TX);
-
-		/* Queue a message for the print task to display on the LCD. */
-		xQueueSend( xPrintQueue, &pcInterruptMessage, portMAX_DELAY );
-
-		/* Make sure we don't process bounces. */
-		vTaskDelay( mainUART_DELAY );
-		xSemaphoreTake( xButtonSemaphore, mainNO_DELAY );
-	}
-}
 
 /*-----------------------------------------------------------*/
 
@@ -354,21 +276,6 @@ unsigned long ulStatus;
 		}
 	}
 }
-/*-----------------------------------------------------------*/
-
-void vGPIO_ISR( void )
-{
-portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-
-	/* Clear the interrupt. */
-	GPIOPinIntClear(GPIO_PORTC_BASE, mainPUSH_BUTTON);
-
-	/* Wake the button handler task. */
-	xSemaphoreGiveFromISR( xButtonSemaphore, &xHigherPriorityTaskWoken );
-
-	portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
-}
-/*-----------------------------------------------------------*/
 
 static void vPrintTask( void *pvParameters )
 {
