@@ -82,6 +82,7 @@
 
 /* Delay between cycles of the 'check' task. */
 #define mainCHECK_DELAY						( ( TickType_t ) 5000 / portTICK_PERIOD_MS )
+#define mainUART_DELAY						( ( TickType_t ) 10000 / portTICK_PERIOD_MS )
 
 /* UART configuration - note this does not use the FIFO so is not very
 efficient. */
@@ -122,8 +123,10 @@ static void vButtonHandlerTask( void *pvParameters );
  */
 static void vPrintTask( void *pvParameter );
 
+static void vUARTTask( void *pvParameter );
+
 /* String that is transmitted on the UART. */
-static char *cMessage = "Task woken by button interrupt! --- ";
+static char *cMessage = "Hello world";
 static volatile char *pcNextChar;
 
 /* The semaphore used to wake the button handler task from within the GPIO
@@ -154,10 +157,10 @@ int main( void )
 	vStartSemaphoreTasks( mainSEM_TEST_PRIORITY );
 	vStartBlockingQueueTasks( mainBLOCK_Q_PRIORITY );
 
-
+	xTaskCreate(vUARTTask, "UART", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY + 1, NULL);
 	/* Start the tasks defined within the file. */
 	xTaskCreate( vCheckTask, "Check", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY, NULL );
-	xTaskCreate( vButtonHandlerTask, "Status", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY + 1, NULL );
+	//xTaskCreate( vButtonHandlerTask, "Status", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY + 1, NULL );
 	xTaskCreate( vPrintTask, "Print", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY - 1, NULL );
 
 	/* Start the scheduler. */
@@ -264,6 +267,32 @@ static void prvSetupHardware( void )
     OSRAMStringDraw("www.FreeRTOS.org", 0, 0);
 	OSRAMStringDraw("LM3S811 demo", 16, 1);
 }
+
+static void vUARTTask( void *pvParameters )
+{
+
+	for( ;; )
+	{
+
+		/* Start the Tx of the message on the UART. */
+		UARTIntDisable( UART0_BASE, UART_INT_TX );
+		{
+			pcNextChar = cMessage;
+
+			/* Send the first character. */
+			if( !( HWREG( UART0_BASE + UART_O_FR ) & UART_FR_TXFF ) )
+			{
+				HWREG( UART0_BASE + UART_O_DR ) = *pcNextChar;
+			}
+
+			pcNextChar++;
+		}
+		UARTIntEnable(UART0_BASE, UART_INT_TX);
+
+		/* Make sure we don't process bounces. */
+		vTaskDelay( mainUART_DELAY );
+	}
+}
 /*-----------------------------------------------------------*/
 
 static void vButtonHandlerTask( void *pvParameters )
@@ -273,7 +302,7 @@ const char *pcInterruptMessage = "Int";
 	for( ;; )
 	{
 		/* Wait for a GPIO interrupt to wake this task. */
-		while( xSemaphoreTake( xButtonSemaphore, portMAX_DELAY ) != pdPASS );
+		//while( xSemaphoreTake( xButtonSemaphore, portMAX_DELAY ) != pdPASS );
 
 		/* Start the Tx of the message on the UART. */
 		UARTIntDisable( UART0_BASE, UART_INT_TX );
@@ -294,7 +323,7 @@ const char *pcInterruptMessage = "Int";
 		xQueueSend( xPrintQueue, &pcInterruptMessage, portMAX_DELAY );
 
 		/* Make sure we don't process bounces. */
-		vTaskDelay( mainDEBOUNCE_DELAY );
+		vTaskDelay( mainUART_DELAY );
 		xSemaphoreTake( xButtonSemaphore, mainNO_DELAY );
 	}
 }
