@@ -26,7 +26,7 @@
  *
  *****************************************************************************/
 
-/*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"
+/*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"*/
 MEMORY
 {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 64K

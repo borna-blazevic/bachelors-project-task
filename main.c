@@ -73,7 +73,6 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
-#include <stdio.h>
 
 /* Demo app includes. */
 #include "integer.h"
@@ -155,7 +154,6 @@ int main( void )
 	vStartSemaphoreTasks( mainSEM_TEST_PRIORITY );
 	vStartBlockingQueueTasks( mainBLOCK_Q_PRIORITY );
 
-	printf("hello world");
 
 	/* Start the tasks defined within the file. */
 	xTaskCreate( vCheckTask, "Check", configMINIMAL_STACK_SIZE, NULL, mainCHECK_TASK_PRIORITY, NULL );
