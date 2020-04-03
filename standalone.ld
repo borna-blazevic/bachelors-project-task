@@ -29,42 +29,49 @@
 /*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"*/
 MEMORY
 {
-    FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 64K
-    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 8K
+    FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
+    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 64K
 }
 
 SECTIONS
 {
+    .bootldr :
+    {
+        . = ALIGN(16);
+        KEEP(*(.bootldr))
+        FILL(0xFFFFFF)
+        . = 0x16000;
+    } > FLASH
     .text :
-{
-KEEP(*(.isr_vector))
-    *(.text)
-    *(.rodata*)
-    _etext = .;
-} > FLASH
+    {
+    KEEP(*(.isr_vector))
+        *(.text)
+        *(.rodata*)
+        _etext = .;
+    } > FLASH
 
 /* .data : AT (ADDR(.text) + SIZEOF(.text)) */
-.ARM.exidx :
-{
-    *(.ARM.exidx*)
-    *(.gnu.linkonce.armexidx.*)
-} > FLASH
+    .ARM.exidx :
+    {
+        *(.ARM.exidx*)
+        *(.gnu.linkonce.armexidx.*)
+    } > FLASH
 
-_begin_data = .;
+    _begin_data = .;
 
-.data : AT ( _begin_data )
-{
-    _data = .;
-    *(vtable)
-    *(.data)
-    _edata = .;
-} > SRAM
+    .data : AT ( _begin_data )
+    {
+        _data = .;
+        *(vtable)
+        *(.data)
+        _edata = .;
+    } > SRAM
 
-.bss :
-{
-    _bss = .;
-    *(.bss)
-    *(COMMON)
-    _ebss = .;
-} > SRAM
+    .bss :
+    {
+        _bss = .;
+        *(.bss)
+        *(COMMON)
+        _ebss = .;
+    } > SRAM
 }
