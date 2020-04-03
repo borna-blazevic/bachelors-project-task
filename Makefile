@@ -59,7 +59,7 @@ all: ${COMPILER}           \
 clean:
 	@rm -rf ${COMPILER} ${wildcard *.bin} RTOSDemo.axf
 
-$(COMPILER)/RTOSDemoBootloader.o: ../projekt_bootloader/$(COMPILER)/RTOSDemoBootloader.bin
+$(COMPILER)/RTOSDemoBootloader.o: ../bootloader/$(COMPILER)/RTOSDemoBootloader.bin
 	@arm-none-eabi-ld -r -b binary $< -o $@
 	$(OBJCOPY) --rename-section .data=.bootldr $@
 
