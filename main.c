@@ -49,7 +49,7 @@ static void prvSetupHardware( void );
 static void vUARTTask( void *pvParameter );
 
 /* String that is transmitted on the UART. */
-static char *cMessage = "Hello world";
+static char *cMessage = "Hello world task\n";
 static volatile char *pcNextChar;
 
 /*-----------------------------------------------------------*/
