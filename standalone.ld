@@ -44,10 +44,10 @@ SECTIONS
     } > FLASH
     .text :
     {
-    KEEP(*(.isr_vector))
-        *(.text)
-        *(.rodata*)
-        _etext = .;
+        KEEP(*(.isr_vector))
+            *(.text)
+            *(.rodata*)
+            _etext = .;
     } > FLASH
 
 /* .data : AT (ADDR(.text) + SIZEOF(.text)) */
