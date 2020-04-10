@@ -33,6 +33,8 @@ MEMORY
     SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 64K
 }
 
+_bootenv = ADDR(.bootldr) + 0x200;
+
 SECTIONS
 {
     .bootldr :

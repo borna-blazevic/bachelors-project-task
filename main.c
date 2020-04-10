@@ -45,6 +45,9 @@ efficient. */
 /*
  * Configure the processor and peripherals for this demo.
  */
+
+extern char *_bootenv;
+
 static void prvSetupHardware( void );
 static void vUARTTask( void *pvParameter );
 
@@ -59,13 +62,46 @@ int main( void )
 	/* Configure the clocks, UART and GPIO. */
 	prvSetupHardware();
 
-	xTaskCreate(vUARTTask, "UART", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+	if (*_bootenv != '/0')
+	{
+		/* Start the Tx of the message on the UART. */
+		UARTIntDisable(UART0_BASE, UART_INT_TX);
+		{
+			pcNextChar = _bootenv;
 
-	/* Start the scheduler. */
-	vTaskStartScheduler();
+			/* Send the first character. */
+			if (!(HWREG(UART0_BASE + UART_O_FR) & UART_FR_TXFF))
+			{
+				HWREG(UART0_BASE + UART_O_DR) = *pcNextChar;
+			}
 
-	/* Will only get here if there was insufficient heap to start the
-	scheduler. */
+			pcNextChar++;
+		}
+		UARTIntEnable(UART0_BASE, UART_INT_TX);
+
+		/* Make sure we don't process bounces. */
+	}
+	else
+	{
+		/* Start the Tx of the message on the UART. */
+		UARTIntDisable(UART0_BASE, UART_INT_TX);
+		{
+			pcNextChar = cMessage;
+
+			/* Send the first character. */
+			if (!(HWREG(UART0_BASE + UART_O_FR) & UART_FR_TXFF))
+			{
+				HWREG(UART0_BASE + UART_O_DR) = *pcNextChar;
+			}
+
+			pcNextChar++;
+		}
+		UARTIntEnable(UART0_BASE, UART_INT_TX);
+
+		/* Make sure we don't process bounces. */
+	}
+
+	memcpy(_bootenv, "Task sent hi\n", 14);
 
 	return 0;
 }
@@ -100,27 +136,7 @@ static void prvSetupHardware( void )
 static void vUARTTask( void *pvParameters )
 {
 
-	for( ;; )
-	{
 
-		/* Start the Tx of the message on the UART. */
-		UARTIntDisable( UART0_BASE, UART_INT_TX );
-		{
-			pcNextChar = cMessage;
-
-			/* Send the first character. */
-			if( !( HWREG( UART0_BASE + UART_O_FR ) & UART_FR_TXFF ) )
-			{
-				HWREG( UART0_BASE + UART_O_DR ) = *pcNextChar;
-			}
-
-			pcNextChar++;
-		}
-		UARTIntEnable(UART0_BASE, UART_INT_TX);
-
-		/* Make sure we don't process bounces. */
-		vTaskDelay( mainUART_DELAY );
-	}
 }
 
 /*-----------------------------------------------------------*/
