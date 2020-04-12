@@ -46,62 +46,42 @@ efficient. */
  * Configure the processor and peripherals for this demo.
  */
 
-extern char *_bootenv;
 
 static void prvSetupHardware( void );
 static void vUARTTask( void *pvParameter );
 
 /* String that is transmitted on the UART. */
 static char *cMessage = "Hello world task\n";
+extern char _shared_data_start;
+// char *bootenv __attribute__((at(0x16000))) = "Bootenv Test\n";
 static volatile char *pcNextChar;
 
 /*-----------------------------------------------------------*/
 
-int main( void )
+int main(void)
 {
 	/* Configure the clocks, UART and GPIO. */
 	prvSetupHardware();
+	char *bootenv = &_shared_data_start;
 
-	if (*_bootenv != '/0')
+	/* Start the Tx of the message on the UART. */
+	UARTIntDisable(UART0_BASE, UART_INT_TX);
 	{
-		/* Start the Tx of the message on the UART. */
-		UARTIntDisable(UART0_BASE, UART_INT_TX);
+		pcNextChar = bootenv;
+		/* Send the first character. */
+		if (!(HWREG(UART0_BASE + UART_O_FR) & UART_FR_TXFF))
 		{
-			pcNextChar = _bootenv;
-
-			/* Send the first character. */
-			if (!(HWREG(UART0_BASE + UART_O_FR) & UART_FR_TXFF))
-			{
-				HWREG(UART0_BASE + UART_O_DR) = *pcNextChar;
-			}
-
-			pcNextChar++;
+			HWREG(UART0_BASE + UART_O_DR) = *pcNextChar;
 		}
-		UARTIntEnable(UART0_BASE, UART_INT_TX);
 
-		/* Make sure we don't process bounces. */
+		pcNextChar++;
 	}
-	else
-	{
-		/* Start the Tx of the message on the UART. */
-		UARTIntDisable(UART0_BASE, UART_INT_TX);
-		{
-			pcNextChar = cMessage;
+	UARTIntEnable(UART0_BASE, UART_INT_TX);
 
-			/* Send the first character. */
-			if (!(HWREG(UART0_BASE + UART_O_FR) & UART_FR_TXFF))
-			{
-				HWREG(UART0_BASE + UART_O_DR) = *pcNextChar;
-			}
+	
+	memcpy(bootenv,"Task sent hi\n", 14);
 
-			pcNextChar++;
-		}
-		UARTIntEnable(UART0_BASE, UART_INT_TX);
-
-		/* Make sure we don't process bounces. */
-	}
-
-	memcpy(_bootenv, "Task sent hi\n", 14);
+	/* Make sure we don't process bounces. */
 
 	return 0;
 }

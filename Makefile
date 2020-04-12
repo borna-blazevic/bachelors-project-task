@@ -38,8 +38,7 @@ OBJS=${COMPILER}/main.o	\
       ${COMPILER}/tasks.o   \
       ${COMPILER}/port.o    \
       ${COMPILER}/heap_1.o  \
-	  ${COMPILER}/osram96x16.o \
-      $(COMPILER)/RTOSDemoBootloader.o
+	  ${COMPILER}/osram96x16.o
 
 INIT_OBJS= ${COMPILER}/startup.o
 
@@ -59,9 +58,6 @@ all: ${COMPILER}           \
 clean:
 	@rm -rf ${COMPILER} ${wildcard *.bin} RTOSDemo.axf
 
-$(COMPILER)/RTOSDemoBootloader.o: ../bootloader/$(COMPILER)/RTOSDemoBootloader.bin
-	@arm-none-eabi-ld -r -b binary $< -o $@
-	$(OBJCOPY) --rename-section .data=.bootldr $@
 
 #
 # The rule to create the target directory
@@ -69,7 +65,7 @@ $(COMPILER)/RTOSDemoBootloader.o: ../bootloader/$(COMPILER)/RTOSDemoBootloader.b
 ${COMPILER}:
 	@mkdir ${COMPILER}
 
-${COMPILER}/RTOSDemo.axf: ${INIT_OBJS} ${OBJS} ${LIBS} $(COMPILER)/RTOSDemoBootloader.o
+${COMPILER}/RTOSDemo.axf: ${INIT_OBJS} ${OBJS} ${LIBS}
 SCATTER_RTOSDemo=standalone.ld
 ENTRY_RTOSDemo=ResetISR
 

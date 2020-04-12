@@ -29,21 +29,15 @@
 /*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"*/
 MEMORY
 {
-    FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
-    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 64K
+    FLASH (rx) : ORIGIN = 0x00016000, LENGTH = 240K
+    SHARED (rwx) : ORIGIN = 0x20000000, LENGTH = 1K
+    SRAM (rwx) : ORIGIN = 0x20001000, LENGTH = 63K
 }
 
-_bootenv = ADDR(.bootldr) + 0x200;
+_shared_data_start = ORIGIN(SHARED);
 
 SECTIONS
 {
-    .bootldr :
-    {
-        . = ALIGN(16);
-        KEEP(*(.bootldr))
-        FILL(0xFFFFFF)
-        . = 0x16000;
-    } > FLASH
     .text :
     {
         KEEP(*(.isr_vector))
