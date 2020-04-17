@@ -34,6 +34,7 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#include "uart.h"
 
 /* Delay between cycles of the 'check' task. */
 #define mainUART_DELAY						( ( TickType_t ) 10000 / portTICK_PERIOD_MS )
@@ -50,11 +51,17 @@ efficient. */
 static void prvSetupHardware( void );
 static void vUARTTask( void *pvParameter );
 
+
+
+char uart_buffer[50];
+
 /* String that is transmitted on the UART. */
 static char *cMessage = "Hello world task\n";
 extern char _shared_data_start;
 // char *bootenv __attribute__((at(0x16000))) = "Bootenv Test\n";
 static volatile char *pcNextChar;
+
+void printUART(char *mes);
 
 /*-----------------------------------------------------------*/
 
@@ -77,15 +84,41 @@ int main(void)
 		pcNextChar++;
 	}
 	UARTIntEnable(UART0_BASE, UART_INT_TX);
-
-	
 	memcpy(bootenv,"Task sent hi\n", 14);
 
-	/* Make sure we don't process bounces. */
+	pcNextChar=uart_buffer;
+	while (1)
+	{
+		*pcNextChar=UARTCharGet(UART0_BASE);
 
+		if(pcNextChar-uart_buffer >= 49){
+
+			*pcNextChar='\0';
+			pcNextChar=uart_buffer;
+			printUART(uart_buffer);
+			*pcNextChar='\0';
+		}else
+		{
+			pcNextChar++;
+			*pcNextChar='\0';
+			printUART(uart_buffer);
+		}
+
+	}
 	return 0;
 }
 /*-----------------------------------------------------------*/
+
+void printUART(char *mes){
+	
+	while (*mes != '\0')
+	{
+		UARTCharPut(UART0_BASE, *mes);
+		mes++;
+	}
+	UARTCharPut(UART0_BASE, '\n');
+	
+}
 
 static void prvSetupHardware( void )
 {
@@ -108,7 +141,7 @@ static void prvSetupHardware( void )
 	HWREG( UART0_BASE + UART_O_LCR_H ) &= ~mainFIFO_SET;
 
 	/* Enable Tx interrupts. */
-	HWREG( UART0_BASE + UART_O_IM ) |= UART_INT_TX;
+	HWREG( UART0_BASE + UART_O_IM ) |= UART_INT_RX;
 	IntPrioritySet( INT_UART0, configKERNEL_INTERRUPT_PRIORITY );
 	IntEnable( INT_UART0 );
 }
