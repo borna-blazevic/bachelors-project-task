@@ -29,12 +29,14 @@
 /*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"*/
 MEMORY
 {
-    FLASH (rx) : ORIGIN = 0x00016000, LENGTH = 240K
+    RECOVERY_IMAGE (rx) : ORIGIN = 0x00016000, LENGTH = 32K
+    NEW_IMAGE (rx) : ORIGIN = 0x00048000, LENGTH = 32K
     SHARED (rwx) : ORIGIN = 0x20000000, LENGTH = 1K
     SRAM (rwx) : ORIGIN = 0x20001000, LENGTH = 63K
 }
 
 _shared_data_start = ORIGIN(SHARED);
+_new_image_start = ORIGIN(NEW_IMAGE);
 
 SECTIONS
 {
@@ -44,14 +46,14 @@ SECTIONS
             *(.text)
             *(.rodata*)
             _etext = .;
-    } > FLASH
+    } > RECOVERY_IMAGE
 
 /* .data : AT (ADDR(.text) + SIZEOF(.text)) */
     .ARM.exidx :
     {
         *(.ARM.exidx*)
         *(.gnu.linkonce.armexidx.*)
-    } > FLASH
+    } > RECOVERY_IMAGE
 
     _begin_data = .;
 
