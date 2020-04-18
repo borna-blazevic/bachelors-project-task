@@ -144,28 +144,8 @@ void printUART(char *mes){
 
 static void prvSetupHardware( void )
 {
-	/* Setup the PLL. */
 	SysCtlClockSet( SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_8MHZ );
 	SysCtlPeripheralEnable( SYSCTL_PERIPH_UART0 );
 	UARTEnable( UART0_BASE );
 
-}
-
-static void vUARTTask( void *pvParameters )
-{
-
-
-}
-
-/*-----------------------------------------------------------*/
-
-void vUART_ISR(void)
-{
-unsigned long ulStatus;
-
-	/* What caused the interrupt. */
-	ulStatus = UARTIntStatus( UART0_BASE, pdTRUE );
-
-	/* Clear the interrupt. */
-	UARTIntClear( UART0_BASE, ulStatus );
 }
