@@ -35,6 +35,7 @@
 #include "queue.h"
 #include "semphr.h"
 #include "uart.h"
+#include "flash.h"
 
 /* Delay between cycles of the 'check' task. */
 #define mainUART_DELAY						( ( TickType_t ) 10000 / portTICK_PERIOD_MS )
@@ -55,10 +56,12 @@ static void vUARTTask( void *pvParameter );
 
 char uart_buffer[50];
 
-/* String that is transmitted on the UART. */
-static char *cMessage = "Hello world task\n";
 extern char _shared_data_start;
-// char *bootenv __attribute__((at(0x16000))) = "Bootenv Test\n";
+extern uint32_t _new_image_start;
+
+
+uint32_t *pImage;
+uint32_t recievingByte;
 static volatile char *pcNextChar;
 
 void printUART(char *mes);
@@ -68,8 +71,12 @@ void printUART(char *mes);
 int main(void)
 {
 	/* Configure the clocks, UART and GPIO. */
-	prvSetupHardware();
 	char *bootenv = &_shared_data_start;
+	pImage = &_new_image_start;
+	int i;
+	uint32_t imagesize;
+	char check[5];
+	prvSetupHardware();
 
 	/* Start the Tx of the message on the UART. */
 	UARTIntDisable(UART0_BASE, UART_INT_TX);
@@ -84,27 +91,52 @@ int main(void)
 		pcNextChar++;
 	}
 	UARTIntEnable(UART0_BASE, UART_INT_TX);
-	memcpy(bootenv,"Task sent hi\n", 14);
+	memcpy(bootenv,"UTask sent hi\n", 15);
 
-	pcNextChar=uart_buffer;
-	while (1)
+	
+	imagesize = UARTCharGet(UART0_BASE);
+	imagesize |= UARTCharGet(UART0_BASE)<<8;
+	imagesize |= UARTCharGet(UART0_BASE)<<16;
+	imagesize |= UARTCharGet(UART0_BASE)<<24;
+
+	for (i = 1; i <= imagesize; i++)
 	{
-		*pcNextChar=UARTCharGet(UART0_BASE);
-
-		if(pcNextChar-uart_buffer >= 49){
-
-			*pcNextChar='\0';
-			pcNextChar=uart_buffer;
-			printUART(uart_buffer);
-			*pcNextChar='\0';
-		}else
+		if (i % 4 == 0)
 		{
-			pcNextChar++;
-			*pcNextChar='\0';
-			printUART(uart_buffer);
-		}
+			recievingByte += UARTCharGet(UART0_BASE) << 24;
+			if(FlashProtectSet(pImage, FlashReadWrite)){
+				if(FlashProtectGet(pImage) == 0)
+					printUART("Failed at set protect, protection set FlashReadWrite");
+				if(FlashProtectGet(pImage) == 1)
+					printUART("Failed at set protect, protection set FlashReadOnly");
+				if(FlashProtectGet(pImage) == 2)
+					printUART("Failed at set protect, protection set FlashExecuteOnly");
+			}
+			
+			if(FlashErase(pImage))
+				printUART("Falied at erase");
 
+			
+			if(FlashProgram(&recievingByte, pImage, sizeof(recievingByte)))
+				printUART("Falied at program");
+		}
+		else if (i % 3 == 0)
+		{
+			recievingByte += UARTCharGet(UART0_BASE) << 16;
+			printUART("hi");
+		}
+		else if (i % 2 == 0)
+		{
+			recievingByte += UARTCharGet(UART0_BASE) << 8;
+			printUART("hi");
+		}
+		else
+		{
+			recievingByte = UARTCharGet(UART0_BASE);
+			printUART("hi");
+		}
 	}
+	printUART("Done");
 	return 0;
 }
 /*-----------------------------------------------------------*/
