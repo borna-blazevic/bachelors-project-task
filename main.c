@@ -37,6 +37,7 @@
 #include "lmi_flash.h"
 #include "sysctl.h"
 #include "string.h"
+#include <stdio.h>
 
 /* Delay between cycles of the 'check' task. */
 #define mainUART_DELAY						( ( TickType_t ) 10000 / portTICK_PERIOD_MS )
@@ -74,14 +75,22 @@ int main(void)
 	/* Configure the clocks, UART and GPIO. */
 	char *bootenv = &_shared_data_start;
 	pImage = &_new_image_start;
-	int i;
+	int i, j = 0;
 	uint32_t imagesize;
-	char check[5];
+	char recievingChar;
 	prvSetupHardware();
 
 	/* Start the Tx of the message on the UART. */
 	printUART(bootenv);
-	memcpy(bootenv,"UTask sent hi\n", 15);
+
+	if(*bootenv == 'R'){
+		memcpy(bootenv,"UTask recovery sent hi\n", 24);
+		SysCtlReset();
+	}
+	memcpy(bootenv,"UTask recovery sent hi\n", 24);
+
+	
+	FlashUsecSet(SysCtlClockGet() / 1000000);
 
 	
 	imagesize = UARTCharGet(UART0_BASE);
@@ -89,47 +98,78 @@ int main(void)
 	imagesize |= UARTCharGet(UART0_BASE)<<16;
 	imagesize |= UARTCharGet(UART0_BASE)<<24;
 
+	j=1;
+
 	for (i = 1; i <= imagesize; i++)
 	{
-		if (i % 4 == 0)
+
+		if (j == 4)
 		{
-			recievingByte += UARTCharGet(UART0_BASE) << 24;
-			if(FlashProtectSet(pImage, FlashReadWrite)){
-				if(FlashProtectGet(pImage) == 0)
-					printUART("Failed at set protect, protection set FlashReadWrite");
-				if(FlashProtectGet(pImage) == 1)
-					printUART("Failed at set protect, protection set FlashReadOnly");
-				if(FlashProtectGet(pImage) == 2)
-					printUART("Failed at set protect, protection set FlashExecuteOnly");
-			}
+			recievingChar = UARTCharGet(UART0_BASE);
+			recievingByte += ((uint32_t) recievingChar) << 24;
+			// if(FlashProtectSet(0xC000, FlashReadWrite)){
+			// 	if(FlashProtectGet(0xC000) == 0)
+			// 		printUART("Failed at set protect, protection set FlashReadWrite\n");
+			// 	if(FlashProtectGet(0xC000) == 1)
+			// 		printUART("Failed at set protect, protection set FlashReadOnly\n");
+			// 	if(FlashProtectGet(0xC000) == 2)
+			// 		printUART("Failed at set protect, protection set FlashExecuteOnly\n");
+			// 	continue;
+			// }
 			
-			if(FlashErase(pImage))
-				printUART("Falied at erase");
+			// if(FlashErase(pImage)){
+			// 	printUART("Falied at erase");
+			// 	continue;
+			// }
 
 			
-			if(FlashProgram(&recievingByte, pImage, sizeof(recievingByte)))
-				printUART("Falied at program");
+			// if(FlashProgram(&recievingByte, pImage, sizeof(recievingByte))){
+			// 	printUART("Falied at program\n");
+			// 	continue;
+			// }
+			memcpy(pImage,&recievingByte,sizeof(recievingByte));
+			printUART("Bytes written\n");
+			pImage++;
+			j=1;
 		}
-		else if (i % 3 == 0)
+		else if (j == 3)
 		{
-			recievingByte += UARTCharGet(UART0_BASE) << 16;
-			printUART("hi");
+			recievingChar = UARTCharGet(UART0_BASE);
+			recievingByte += ((uint32_t) recievingChar) << 16;
+			j=4;
+			printUART("Byte recieved\n");
 		}
-		else if (i % 2 == 0)
+		else if (j == 2)
 		{
-			recievingByte += UARTCharGet(UART0_BASE) << 8;
-			printUART("hi");
+			recievingChar = UARTCharGet(UART0_BASE);
+			recievingByte += ((uint32_t) recievingChar) << 8;
+			j=3;
+			printUART("Byte recieved\n");
 		}
 		else
 		{
-			recievingByte = UARTCharGet(UART0_BASE);
-			printUART("hi");
+			recievingChar = UARTCharGet(UART0_BASE);
+			recievingByte =  ((uint32_t) recievingChar);
+			j=2;
+			printUART("Byte recieved\n");
 		}
 	}
-	printUART("Done");
+
+	printUART("Done\n");
+	SysCtlReset();
+	
 	return 0;
 }
 /*-----------------------------------------------------------*/
+
+void printUARTint(uint32_t *mes){
+	int i;
+	UARTCharPut(UART0_BASE, (*mes & 0xff000000) >> 24);
+	UARTCharPut(UART0_BASE, (*mes & 0xff0000) >> 16);
+	UARTCharPut(UART0_BASE, (*mes & 0xff00) >> 8);
+	UARTCharPut(UART0_BASE, (*mes & 0xff));
+	
+}
 
 void printUART(char *mes){
 	
@@ -138,7 +178,11 @@ void printUART(char *mes){
 		UARTCharPut(UART0_BASE, *mes);
 		mes++;
 	}
-	UARTCharPut(UART0_BASE, '\n');
+	
+}
+void printUARTchar(char *mes){
+	
+	UARTCharPut(UART0_BASE, *mes);
 	
 }
 

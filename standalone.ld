@@ -29,11 +29,11 @@
 /*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"*/
 MEMORY
 {
-    BOOTLOADER (rx) : ORIGIN = 0x00000000, LENGTH = 16K
-    RECOVERY_IMAGE (rx) : ORIGIN = 0x00016000, LENGTH = 32K
-    NEW_IMAGE (rwx) : ORIGIN = 0x00048000, LENGTH = 32K
+    BOOTLOADER (RX) : ORIGIN = 0x00000000, LENGTH = 16K
+    RECOVERY_IMAGE (RX) : ORIGIN = 0x00004000, LENGTH = 240K
     SHARED (rwx) : ORIGIN = 0x20000000, LENGTH = 1K
-    SRAM (rwx) : ORIGIN = 0x20001000, LENGTH = 63K
+    NEW_IMAGE (RWX) : ORIGIN = 0x20000400, LENGTH = 32K
+    SRAM (rwx) : ORIGIN = 0x2000C400, LENGTH = 31K
 }
 
 _shared_data_start = ORIGIN(SHARED);
@@ -72,5 +72,9 @@ SECTIONS
         *(.bss)
         *(COMMON)
         _ebss = .;
+        . = ALIGN (8);
+        _end = .;
     } > SRAM
+
+    PROVIDE(__HEAP_START = _end );
 }
