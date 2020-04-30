@@ -26,12 +26,6 @@
  */
 
 #include "FreeRTOS.h"
-#include "hw_types.h"
-#include "hw_memmap.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "lmi_flash.h"
 #include <stdio.h>
 #include <communication_uart.h>
 

@@ -26,11 +26,10 @@
 include makedefs
 
 RTOS_SOURCE_DIR=FreeRTOS
-DEMO_SOURCE_DIR=Common/Minimal
 
 CFLAGS+=-I LuminaryMicro -I . -I./include -I ${RTOS_SOURCE_DIR}/include -I ${RTOS_SOURCE_DIR}/portable/GCC/ARM_CM3 -D GCC_ARMCM3_LM3S102 -D inline=
 
-VPATH=${RTOS_SOURCE_DIR}:${RTOS_SOURCE_DIR}/portable/MemMang:${RTOS_SOURCE_DIR}/portable/GCC/ARM_CM3:${DEMO_SOURCE_DIR}:init:LuminaryMicro:src
+VPATH=${RTOS_SOURCE_DIR}:${RTOS_SOURCE_DIR}/portable/MemMang:${RTOS_SOURCE_DIR}/portable/GCC/ARM_CM3::init:LuminaryMicro:src
 
 OBJS=${COMPILER}/main.o	\
 	  ${COMPILER}/list.o    \
