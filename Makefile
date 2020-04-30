@@ -49,14 +49,14 @@ LIBS= LuminaryMicro/arm-none-eabi-gcc/libdriver.a
 # The default rule, which causes init to be built.
 #
 all: ${COMPILER}           \
-     ${COMPILER}/RTOSDemo.axf \
+     ${COMPILER}/task.axf \
 	 
 #
 # The rule to clean out all the build products
 #
 
 clean:
-	@rm -rf ${COMPILER} ${wildcard *.bin} RTOSDemo.axf
+	@rm -rf ${COMPILER} ${wildcard *.bin} task.axf
 
 
 #
@@ -65,9 +65,9 @@ clean:
 ${COMPILER}:
 	@mkdir ${COMPILER}
 
-${COMPILER}/RTOSDemo.axf: ${INIT_OBJS} ${OBJS} ${LIBS}
-SCATTER_RTOSDemo=standalone.ld
-ENTRY_RTOSDemo=ResetISR
+${COMPILER}/task.axf: ${INIT_OBJS} ${OBJS} ${LIBS}
+SCATTER_task=standalone.ld
+ENTRY_task=ResetISR
 
 #
 #
