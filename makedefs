@@ -66,16 +66,21 @@ CC=arm-none-eabi-gcc
 # The flags passed to the assembler.
 #
 AFLAGS=-mthumb         \
-       -mcpu=cortex-m3 \
+       -mcpu=cortex-m4 \
        -MD
 
 #
 # The flags passed to the compiler.
 #
-CFLAGS=-mthumb         \
-       -mcpu=cortex-m3 \
-       -O2             \
-       -MD
+CFLAGS = -Wall \
+         -mcpu=cortex-m4 \
+         -mthumb \
+         -mfloat-abi=softfp \
+         -fomit-frame-pointer \
+         -fno-strict-aliasing \
+         -specs=nosys.specs \
+         -specs=nano.specs \
+         -g -std=c99
 
 #
 # The command for calling the library archiver.
@@ -85,12 +90,12 @@ AR=arm-none-eabi-ar
 #
 # The command for calling the linker.
 #
-LD=arm-none-eabi-ld
+LD=arm-none-eabi-gcc
 
 #
 # The flags passed to the linker.
 #
-LDFLAGS= -Map gcc/out.map
+LDFLAGS = -specs=nosys.specs -specs=nano.specs -mcpu=cortex-m4 -mthumb
 
 #
 # Get the location of libgcc.a from the GCC front-end.

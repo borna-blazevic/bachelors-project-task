@@ -38,6 +38,8 @@ MEMORY
 
 _shared_data_start = ORIGIN(SHARED);
 _new_image_start = ORIGIN(NEW_IMAGE);
+_Min_Heap_Size = 0x200;;      /* required amount of heap  */
+_Min_Stack_Size = 0x400;; /* required amount of stack */
 
 SECTIONS
 {
@@ -69,12 +71,20 @@ SECTIONS
     .bss :
     {
         _bss = .;
+        __bss_start__ = _bss;
         *(.bss)
         *(COMMON)
         _ebss = .;
         . = ALIGN (8);
-        _end = .;
+        __bss_end__ = .;
     } > SRAM
-
-    PROVIDE(__HEAP_START = _end );
+    ._user_heap_stack :
+    {
+        . = ALIGN(4);
+        PROVIDE ( end = . );
+        PROVIDE ( _end = . );
+        . = . + _Min_Heap_Size;
+        . = . + _Min_Stack_Size;
+        . = ALIGN(4);
+    } > SRAM
 }
