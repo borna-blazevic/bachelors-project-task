@@ -29,8 +29,7 @@
 /*Changed according to http://roboticravings.blogspot.com/2018/07/freertos-on-cortex-m3-with-qemu.html so the project can be compiled"*/
 MEMORY
 {
-    BOOTLOADER (RX) : ORIGIN = 0x00000000, LENGTH = 32K
-    RECOVERY_IMAGE (RX) : ORIGIN = 0x00008000, LENGTH = 240K
+    BOOTLOADER (RX) : ORIGIN = 0x00000000, LENGTH = 256K
     SHARED (rwx) : ORIGIN = 0x20000000, LENGTH = 1K
     NEW_IMAGE (RWX) : ORIGIN = 0x20000400, LENGTH = 32K
     SRAM (rwx) : ORIGIN = 0x20008400, LENGTH = 31K
@@ -49,14 +48,14 @@ SECTIONS
             *(.text)
             *(.rodata*)
             _etext = .;
-    } > RECOVERY_IMAGE
+    } > BOOTLOADER
 
 /* .data : AT (ADDR(.text) + SIZEOF(.text)) */
     .ARM.exidx :
     {
         *(.ARM.exidx*)
         *(.gnu.linkonce.armexidx.*)
-    } > RECOVERY_IMAGE
+    } > BOOTLOADER
 
     _begin_data = .;
 
@@ -77,15 +76,15 @@ SECTIONS
         _ebss = .;
         __bss_end__ = _ebss;
         . = ALIGN (8);
-        _end = .;
-        end = .;
     } > SRAM
 
     ._user_heap_stack :
     {
-        . = ALIGN(4);
+        . = ALIGN(8);
+        PROVIDE ( end = . );
+        PROVIDE ( _end = . );
         . = . + _Min_Heap_Size;
         . = . + _Min_Stack_Size;
-        . = ALIGN(4);
+        . = ALIGN(8);
     } > SRAM
 }

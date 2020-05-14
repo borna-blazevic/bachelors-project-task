@@ -39,97 +39,15 @@ efficient. */
 
 static void prvSetupHardware( void );
 
-extern char _shared_data_start;
-extern uint32_t _new_image_start;
-
-
-uint32_t *pImage;
-uint32_t recievingByte;
-
-/*-----------------------------------------------------------*/
-
 int main(void)
 {
-	/* Configure the clocks, UART and GPIO. */
-	char *bootenv = &_shared_data_start;
-	pImage = &_new_image_start;
-	int i, j = 0;
-	uint32_t imagesize;
-	char recievingChar;
+
 	prvSetupHardware();
 
-	/* Start the Tx of the message on the UART. */
-	print_string(bootenv);
+	print_string("Hello World");
 
-	if(*bootenv == 'R'){
-		memcpy(bootenv,"UTask recovery sent hi\n", 24);
-		SysCtlReset();
-	}
-	memcpy(bootenv,"UTask recovery sent hi\n", 24);
-
+	for (;;) ;
 	
-	// FlashUsecSet(SysCtlClockGet() / 1000000);
-
-	read_uint32(&imagesize);
-
-	j=1;
-
-	for (i = 1; i <= imagesize; i++)
-	{
-
-		if (j == 4)
-		{
-			read_uint8(&recievingChar);
-			recievingByte += ((uint32_t) recievingChar) << 24;
-			// if(FlashProtectSet(0xC000, FlashReadWrite)){
-			// 	if(FlashProtectGet(0xC000) == 0)
-			// 		printUART("Failed at set protect, protection set FlashReadWrite\n");
-			// 	if(FlashProtectGet(0xC000) == 1)
-			// 		printUART("Failed at set protect, protection set FlashReadOnly\n");
-			// 	if(FlashProtectGet(0xC000) == 2)
-			// 		printUART("Failed at set protect, protection set FlashExecuteOnly\n");
-			// 	continue;
-			// }
-			
-			// if(FlashErase(pImage)){
-			// 	printUART("Falied at erase");
-			// 	continue;
-			// }
-
-			
-			// if(FlashProgram(&recievingByte, pImage, sizeof(recievingByte))){
-			// 	printUART("Falied at program\n");
-			// 	continue;
-			// }
-			memcpy(pImage,&recievingByte,sizeof(recievingByte));
-			print_string("Bytes written\n");
-			pImage++;
-			j=1;
-		}
-		else if (j == 3)
-		{
-			read_uint8(&recievingChar);
-			recievingByte += ((uint32_t) recievingChar) << 16;
-			j=4;
-			print_string("Byte recieved\n");
-		}
-		else if (j == 2)
-		{
-			read_uint8(&recievingChar);
-			recievingByte += ((uint32_t) recievingChar) << 8;
-			j=3;
-			print_string("Byte recieved\n");
-		}
-		else
-		{
-			read_uint8(&recievingChar);
-			recievingByte =  ((uint32_t) recievingChar);
-			j=2;
-			print_string("Byte recieved\n");
-		}
-	}
-
-	print_string("Done\n");
 	SysCtlReset();
 	
 	return 0;
