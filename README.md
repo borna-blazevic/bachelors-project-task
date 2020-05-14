@@ -12,4 +12,7 @@ and can be debbuged with
 arm-none-eabi-gdb -ex="target remote localhost:1234"
 ```
 
-For debbuging it is necessary to load the debug symbols with the file command from task.axf once in gdb.
+For debbuging it is necessary to load the debug symbols with the file command from task.axf once in gdb. Example:
+```
+file Zavrsni/temp/bachelors-project-task/gcc/task.axf
+```
