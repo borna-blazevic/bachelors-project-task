@@ -52,49 +52,49 @@ void   firmware_upgrade__srec_line__free_unpacked
   assert(message->base.descriptor == &firmware_upgrade__srec_line__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   firmware_upgrade__send_packet__init
-                     (FirmwareUpgrade__SendPacket         *message)
+void   firmware_upgrade__firmware_packet__init
+                     (FirmwareUpgrade__FirmwarePacket         *message)
 {
-  static const FirmwareUpgrade__SendPacket init_value = FIRMWARE_UPGRADE__SEND_PACKET__INIT;
+  static const FirmwareUpgrade__FirmwarePacket init_value = FIRMWARE_UPGRADE__FIRMWARE_PACKET__INIT;
   *message = init_value;
 }
-size_t firmware_upgrade__send_packet__get_packed_size
-                     (const FirmwareUpgrade__SendPacket *message)
+size_t firmware_upgrade__firmware_packet__get_packed_size
+                     (const FirmwareUpgrade__FirmwarePacket *message)
 {
-  assert(message->base.descriptor == &firmware_upgrade__send_packet__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__firmware_packet__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t firmware_upgrade__send_packet__pack
-                     (const FirmwareUpgrade__SendPacket *message,
+size_t firmware_upgrade__firmware_packet__pack
+                     (const FirmwareUpgrade__FirmwarePacket *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &firmware_upgrade__send_packet__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__firmware_packet__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t firmware_upgrade__send_packet__pack_to_buffer
-                     (const FirmwareUpgrade__SendPacket *message,
+size_t firmware_upgrade__firmware_packet__pack_to_buffer
+                     (const FirmwareUpgrade__FirmwarePacket *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &firmware_upgrade__send_packet__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__firmware_packet__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-FirmwareUpgrade__SendPacket *
-       firmware_upgrade__send_packet__unpack
+FirmwareUpgrade__FirmwarePacket *
+       firmware_upgrade__firmware_packet__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (FirmwareUpgrade__SendPacket *)
-     protobuf_c_message_unpack (&firmware_upgrade__send_packet__descriptor,
+  return (FirmwareUpgrade__FirmwarePacket *)
+     protobuf_c_message_unpack (&firmware_upgrade__firmware_packet__descriptor,
                                 allocator, len, data);
 }
-void   firmware_upgrade__send_packet__free_unpacked
-                     (FirmwareUpgrade__SendPacket *message,
+void   firmware_upgrade__firmware_packet__free_unpacked
+                     (FirmwareUpgrade__FirmwarePacket *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &firmware_upgrade__send_packet__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__firmware_packet__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   firmware_upgrade__acknowledge__init
@@ -250,11 +250,11 @@ static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descrip
     "byte_count",
     2,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_STRING,
+    PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__SrecLine, byte_count),
     NULL,
-    &protobuf_c_empty_string,
+    NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
@@ -262,11 +262,11 @@ static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descrip
     "address",
     3,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_STRING,
+    PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__SrecLine, address),
     NULL,
-    &protobuf_c_empty_string,
+    NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
@@ -274,11 +274,11 @@ static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descrip
     "data",
     4,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_STRING,
+    PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__SrecLine, data),
     NULL,
-    &protobuf_c_empty_string,
+    NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
@@ -286,11 +286,11 @@ static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descrip
     "checksum",
     5,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_STRING,
+    PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__SrecLine, checksum),
     NULL,
-    &protobuf_c_empty_string,
+    NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
@@ -322,7 +322,7 @@ const ProtobufCMessageDescriptor firmware_upgrade__srec_line__descriptor =
   (ProtobufCMessageInit) firmware_upgrade__srec_line__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor firmware_upgrade__send_packet__field_descriptors[3] =
+static const ProtobufCFieldDescriptor firmware_upgrade__firmware_packet__field_descriptors[3] =
 {
   {
     "sent_checksum",
@@ -330,7 +330,7 @@ static const ProtobufCFieldDescriptor firmware_upgrade__send_packet__field_descr
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__SendPacket, sent_checksum),
+    offsetof(FirmwareUpgrade__FirmwarePacket, sent_checksum),
     NULL,
     NULL,
     0,             /* flags */
@@ -342,7 +342,7 @@ static const ProtobufCFieldDescriptor firmware_upgrade__send_packet__field_descr
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__SendPacket, line),
+    offsetof(FirmwareUpgrade__FirmwarePacket, line),
     &firmware_upgrade__srec_line__descriptor,
     NULL,
     0,             /* flags */
@@ -354,36 +354,36 @@ static const ProtobufCFieldDescriptor firmware_upgrade__send_packet__field_descr
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__SendPacket, message_checksum),
+    offsetof(FirmwareUpgrade__FirmwarePacket, message_checksum),
     NULL,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned firmware_upgrade__send_packet__field_indices_by_name[] = {
+static const unsigned firmware_upgrade__firmware_packet__field_indices_by_name[] = {
   1,   /* field[1] = line */
   2,   /* field[2] = message_checksum */
   0,   /* field[0] = sent_checksum */
 };
-static const ProtobufCIntRange firmware_upgrade__send_packet__number_ranges[1 + 1] =
+static const ProtobufCIntRange firmware_upgrade__firmware_packet__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 3 }
 };
-const ProtobufCMessageDescriptor firmware_upgrade__send_packet__descriptor =
+const ProtobufCMessageDescriptor firmware_upgrade__firmware_packet__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "firmware_upgrade.send_packet",
-  "SendPacket",
-  "FirmwareUpgrade__SendPacket",
+  "firmware_upgrade.firmware_packet",
+  "FirmwarePacket",
+  "FirmwareUpgrade__FirmwarePacket",
   "firmware_upgrade",
-  sizeof(FirmwareUpgrade__SendPacket),
+  sizeof(FirmwareUpgrade__FirmwarePacket),
   3,
-  firmware_upgrade__send_packet__field_descriptors,
-  firmware_upgrade__send_packet__field_indices_by_name,
-  1,  firmware_upgrade__send_packet__number_ranges,
-  (ProtobufCMessageInit) firmware_upgrade__send_packet__init,
+  firmware_upgrade__firmware_packet__field_descriptors,
+  firmware_upgrade__firmware_packet__field_indices_by_name,
+  1,  firmware_upgrade__firmware_packet__number_ranges,
+  (ProtobufCMessageInit) firmware_upgrade__firmware_packet__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
 static const ProtobufCFieldDescriptor firmware_upgrade__acknowledge__field_descriptors[1] =

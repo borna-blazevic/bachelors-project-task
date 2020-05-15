@@ -40,7 +40,18 @@ void read_uint32(uint32_t *mes){
 
 
 void read_uint8(uint8_t *mes){
-    *mes = UARTCharGet(UART0_BASE) & 0xff;
+    *mes = UARTCharGet(UART0_BASE);
+}
+void read_packet(uint8_t *mes, uint8_t *packet_size){
+
+	uint8_t i = 0;
+	read_uint8(packet_size);
+	while (i<*packet_size)
+	{
+    	*mes = UARTCharGet(UART0_BASE) & 0xff;
+		i++;	
+		mes++;
+	}
 }
 
 void init_uart_communication(){
