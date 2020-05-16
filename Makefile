@@ -1,84 +1,99 @@
-#******************************************************************************
-#
-# Makefile - Rules for building the driver library and examples.
-#
-# Copyright (c) 2005,2006 Luminary Micro, Inc.  All rights reserved.
-#
-# Software License Agreement
-#
-# Luminary Micro, Inc. (LMI) is supplying this software for use solely and
-# exclusively on LMI's Stellaris Family of microcontroller products.
-#
-# The software is owned by LMI and/or its suppliers, and is protected under
-# applicable copyright laws.  All rights are reserved.  Any use in violation
-# of the foregoing restrictions may subject the user to criminal sanctions
-# under applicable laws, as well as to civil liability for the breach of the
-# terms and conditions of this license.
-#
-# THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
-# OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
-# LMI SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
-# CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
-#
-#******************************************************************************
+MODULE_NAME = STM32F407
 
-include makedefs
+#STLINK path
+STLINK = $(whereis st-flash)
 
-RTOS_SOURCE_DIR=FreeRTOS
+#Toolchain
+PREFIX = arm-none-eabi-
 
-CFLAGS+=-ggdb -I LuminaryMicro -I . -I./include -I ./proto -I ${RTOS_SOURCE_DIR}/include -I ${RTOS_SOURCE_DIR}/portable/GCC/ARM_CM3 -D GCC_ARMCM3_LM3S102 -D inline=    
+CC = $(PREFIX)gcc
+AS = $(PREFIX)gcc
+LD = $(PREFIX)gcc
+BIN = $(PREFIX)objcopy
 
-VPATH=${RTOS_SOURCE_DIR}:${RTOS_SOURCE_DIR}/portable/MemMang:${RTOS_SOURCE_DIR}/portable/GCC/ARM_CM3:init:LuminaryMicro:src:proto
+CFLAGS = -Wall \
+         -mcpu=cortex-m4 \
+         -mthumb \
+         -mfloat-abi=softfp \
+         -fomit-frame-pointer \
+         -fno-strict-aliasing \
+         -specs=nosys.specs \
+         -specs=nano.specs \
+         -g -std=c99
 
-OBJS=${COMPILER}/main.o	\
-	  ${COMPILER}/list.o    \
-      ${COMPILER}/queue.o   \
-      ${COMPILER}/tasks.o   \
-      ${COMPILER}/port.o    \
-      ${COMPILER}/heap_1.o  \
-      ${COMPILER}/communication_uart.o  \
-      ${COMPILER}/protobuf-c.o  \
-      ${COMPILER}/firmware_package.pb-c.o  \
-	  ${COMPILER}/osram128x64x4.o
+# Assembler flags
+AFLAGS = -x assembler-with-cpp
 
-INIT_OBJS= ${COMPILER}/startup.o
+# Linker flags
+LDFLAGS = -specs=nosys.specs -specs=nano.specs -mcpu=cortex-m4 -mthumb
 
-LIBS= LuminaryMicro/arm-none-eabi-gcc/libdriver.a
+#Binary flags
+BINFLAGS = -O binary
+
+# Libraries and Startup files
+SPL = Libraries/STM32F4xx_StdPeriph_Driver
+CMSIS = Libraries/CMSIS
+STARTUP = $(CMSIS)/Device/ST/STM32F4xx/Source/Templates/gcc_ride7
+FREERTOS = FreeRTOS
 
 
-#
-# The default rule, which causes init to be built.
-#
-all: ${COMPILER}           \
-     ${COMPILER}/task.axf \
-	 
-#
-# The rule to clean out all the build products
-#
+# Includes
+INC =  -I $(SPL)/inc
+INC += -I $(CMSIS)/Include
+INC += -I $(CMSIS)/Device/ST/STM32F4xx/Include
+INC += -I $(FREERTOS)/include
+INC += -I $(FREERTOS)/portable/ARM_CM4F
+INC += -I ./include
+INC += -I .
 
-clean:
-	@rm -rf ${COMPILER} ${wildcard *.bin} task.axf
+CFLAGS += $(INC)
+CFLAGS += -D USE_STDPERIPH_DRIVER -D STM32F40xx -D USE_STM32F07_DISCO
 
+BLACKLIST = $(SPL)/src/stm32f4xx_fmc.c
 
-#
-# The rule to create the target directory
-#
-${COMPILER}:
-	@mkdir ${COMPILER}
+_SRC = $(wildcard *.c)
+_SRC += $(wildcard $(CMSIS)/Device/ST/STM32F4xx/Templates/*.c)
+_SRC += $(wildcard $(SPL)/src/*.c)
+_SRC += $(wildcard $(FREERTOS)/*.c)
+_SRC += $(wildcard $(FREERTOS)/portable/MemMang/*.c)
+_SRC += $(wildcard $(FREERTOS)/portable/ARM_CM4F/*.c)
+_SRC += $(wildcard ./src/*.c)
+SRC  = $(filter-out $(BLACKLIST), $(_SRC))
 
-${COMPILER}/task.axf: ${INIT_OBJS} ${OBJS} ${LIBS}
-SCATTER_task=standalone.ld
-ENTRY_task=ResetISR
+ASRC = $(STARTUP)/startup_stm32f40xx.s
 
-#
-#
-# Include the automatically generated dependency files.
-#
--include ${wildcard ${COMPILER}/*.d} __dummy__
+OBJ = $(patsubst %.c,%.o,$(SRC))
+AOBJ = $(patsubst %.s,%.o,$(ASRC))
 
+LINKER_SCRIPT = STM32F407VGTx_FLASH.ld
 
-	 
+.PRECIOUS: %.c %.o
 
+all: app.bin
 
+%.o: %.c 
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "$(MODULE_NAME): Compiled $< successfully!"
+
+%.o : %.s 
+	@$(AS) $(CFLAGS) $(AFLAGS) -c $< -o $@
+	@echo "$(MODULE_NAME): Compiled "$<" successfully!"
+
+app.bin : app.elf
+	@$(BIN) $< $(BINFLAGS) $@
+	@echo "$(MODULE_NAME): Generated binary successfully!"
+
+app.elf : $(AOBJ) $(OBJ)
+	@$(LD) $(AOBJ) $(OBJ) \
+	$(LDFLAGS) -o $@ \
+	-lc  \
+	-T$(LINKER_SCRIPT)
+	@echo "$(MODULE_NAME): Linked app successfully!"
+
+clean :
+	@rm -f app.elf app.bin
+	@rm $(OBJ)
+
+burn: app.bin
+	@st-flash write app.bin 0x8000000
 
