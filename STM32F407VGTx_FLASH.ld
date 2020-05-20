@@ -50,9 +50,10 @@ FIRMWARE_UPGRADE (xrw) : ORIGIN = 0x10000000, LENGTH = 64K
 }
 
 
-_shared_data_start = ORIGIN(SHARED);
-_app_start1 = ORIGIN(RECOVERY_IMAGE);
-_app_start2 = ORIGIN(FIRMWARE_UPGRADE);
+_recovery_image = ORIGIN(RECOVERY_IMAGE);
+_new_image = ORIGIN(NEW_IMAGE);
+_shared = ORIGIN(SHARED);
+_firmware_upgrade = ORIGIN(FIRMWARE_UPGRADE);
 
 /* Define output sections */
 SECTIONS
