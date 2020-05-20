@@ -2,9 +2,7 @@
 #ifndef GPIO_H
 #define GPIO_H
 
-#include <stm32f4xx.h> 					// common stuff
-#include <stm32f4xx_gpio.h> 		// gpio control
-#include <stm32f4xx_rcc.h> 			// reset anc clocking
+#include <stdint.h>
 
 //#define LED3_ORANGE_RCC_GPIOx 		RCC_AHB1Periph_GPIOG
 #define LED3_ORANGE_RCC_GPIOx 		RCC_AHB1Periph_GPIOD
