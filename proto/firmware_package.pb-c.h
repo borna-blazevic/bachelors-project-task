@@ -48,13 +48,12 @@ struct  _FirmwareUpgrade__SrecLine
 struct  _FirmwareUpgrade__FirmwarePacket
 {
   ProtobufCMessage base;
-  uint32_t sent_checksum;
+  uint32_t checksum;
   FirmwareUpgrade__SrecLine *line;
-  ProtobufCBinaryData message_checksum;
 };
 #define FIRMWARE_UPGRADE__FIRMWARE_PACKET__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&firmware_upgrade__firmware_packet__descriptor) \
-    , 0, NULL, {0,NULL} }
+    , 0, NULL }
 
 
 struct  _FirmwareUpgrade__Status

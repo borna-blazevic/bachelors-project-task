@@ -232,15 +232,15 @@ const ProtobufCMessageDescriptor firmware_upgrade__srec_line__descriptor =
   (ProtobufCMessageInit) firmware_upgrade__srec_line__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor firmware_upgrade__firmware_packet__field_descriptors[3] =
+static const ProtobufCFieldDescriptor firmware_upgrade__firmware_packet__field_descriptors[2] =
 {
   {
-    "sent_checksum",
+    "checksum",
     1,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_UINT32,
     0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__FirmwarePacket, sent_checksum),
+    offsetof(FirmwareUpgrade__FirmwarePacket, checksum),
     NULL,
     NULL,
     0,             /* flags */
@@ -258,28 +258,15 @@ static const ProtobufCFieldDescriptor firmware_upgrade__firmware_packet__field_d
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
-  {
-    "message_checksum",
-    3,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_BYTES,
-    0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__FirmwarePacket, message_checksum),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
 };
 static const unsigned firmware_upgrade__firmware_packet__field_indices_by_name[] = {
+  0,   /* field[0] = checksum */
   1,   /* field[1] = line */
-  2,   /* field[2] = message_checksum */
-  0,   /* field[0] = sent_checksum */
 };
 static const ProtobufCIntRange firmware_upgrade__firmware_packet__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 3 }
+  { 0, 2 }
 };
 const ProtobufCMessageDescriptor firmware_upgrade__firmware_packet__descriptor =
 {
@@ -289,7 +276,7 @@ const ProtobufCMessageDescriptor firmware_upgrade__firmware_packet__descriptor =
   "FirmwareUpgrade__FirmwarePacket",
   "firmware_upgrade",
   sizeof(FirmwareUpgrade__FirmwarePacket),
-  3,
+  2,
   firmware_upgrade__firmware_packet__field_descriptors,
   firmware_upgrade__firmware_packet__field_indices_by_name,
   1,  firmware_upgrade__firmware_packet__number_ranges,
