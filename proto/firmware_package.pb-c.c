@@ -97,139 +97,49 @@ void   firmware_upgrade__firmware_packet__free_unpacked
   assert(message->base.descriptor == &firmware_upgrade__firmware_packet__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   firmware_upgrade__acknowledge__init
-                     (FirmwareUpgrade__Acknowledge         *message)
+void   firmware_upgrade__status__init
+                     (FirmwareUpgrade__Status         *message)
 {
-  static const FirmwareUpgrade__Acknowledge init_value = FIRMWARE_UPGRADE__ACKNOWLEDGE__INIT;
+  static const FirmwareUpgrade__Status init_value = FIRMWARE_UPGRADE__STATUS__INIT;
   *message = init_value;
 }
-size_t firmware_upgrade__acknowledge__get_packed_size
-                     (const FirmwareUpgrade__Acknowledge *message)
+size_t firmware_upgrade__status__get_packed_size
+                     (const FirmwareUpgrade__Status *message)
 {
-  assert(message->base.descriptor == &firmware_upgrade__acknowledge__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__status__descriptor);
   return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
 }
-size_t firmware_upgrade__acknowledge__pack
-                     (const FirmwareUpgrade__Acknowledge *message,
+size_t firmware_upgrade__status__pack
+                     (const FirmwareUpgrade__Status *message,
                       uint8_t       *out)
 {
-  assert(message->base.descriptor == &firmware_upgrade__acknowledge__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__status__descriptor);
   return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
 }
-size_t firmware_upgrade__acknowledge__pack_to_buffer
-                     (const FirmwareUpgrade__Acknowledge *message,
+size_t firmware_upgrade__status__pack_to_buffer
+                     (const FirmwareUpgrade__Status *message,
                       ProtobufCBuffer *buffer)
 {
-  assert(message->base.descriptor == &firmware_upgrade__acknowledge__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__status__descriptor);
   return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
 }
-FirmwareUpgrade__Acknowledge *
-       firmware_upgrade__acknowledge__unpack
+FirmwareUpgrade__Status *
+       firmware_upgrade__status__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data)
 {
-  return (FirmwareUpgrade__Acknowledge *)
-     protobuf_c_message_unpack (&firmware_upgrade__acknowledge__descriptor,
+  return (FirmwareUpgrade__Status *)
+     protobuf_c_message_unpack (&firmware_upgrade__status__descriptor,
                                 allocator, len, data);
 }
-void   firmware_upgrade__acknowledge__free_unpacked
-                     (FirmwareUpgrade__Acknowledge *message,
+void   firmware_upgrade__status__free_unpacked
+                     (FirmwareUpgrade__Status *message,
                       ProtobufCAllocator *allocator)
 {
   if(!message)
     return;
-  assert(message->base.descriptor == &firmware_upgrade__acknowledge__descriptor);
-  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
-}
-void   firmware_upgrade__reject__init
-                     (FirmwareUpgrade__Reject         *message)
-{
-  static const FirmwareUpgrade__Reject init_value = FIRMWARE_UPGRADE__REJECT__INIT;
-  *message = init_value;
-}
-size_t firmware_upgrade__reject__get_packed_size
-                     (const FirmwareUpgrade__Reject *message)
-{
-  assert(message->base.descriptor == &firmware_upgrade__reject__descriptor);
-  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
-}
-size_t firmware_upgrade__reject__pack
-                     (const FirmwareUpgrade__Reject *message,
-                      uint8_t       *out)
-{
-  assert(message->base.descriptor == &firmware_upgrade__reject__descriptor);
-  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
-}
-size_t firmware_upgrade__reject__pack_to_buffer
-                     (const FirmwareUpgrade__Reject *message,
-                      ProtobufCBuffer *buffer)
-{
-  assert(message->base.descriptor == &firmware_upgrade__reject__descriptor);
-  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
-}
-FirmwareUpgrade__Reject *
-       firmware_upgrade__reject__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data)
-{
-  return (FirmwareUpgrade__Reject *)
-     protobuf_c_message_unpack (&firmware_upgrade__reject__descriptor,
-                                allocator, len, data);
-}
-void   firmware_upgrade__reject__free_unpacked
-                     (FirmwareUpgrade__Reject *message,
-                      ProtobufCAllocator *allocator)
-{
-  if(!message)
-    return;
-  assert(message->base.descriptor == &firmware_upgrade__reject__descriptor);
-  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
-}
-void   firmware_upgrade__ready__init
-                     (FirmwareUpgrade__Ready         *message)
-{
-  static const FirmwareUpgrade__Ready init_value = FIRMWARE_UPGRADE__READY__INIT;
-  *message = init_value;
-}
-size_t firmware_upgrade__ready__get_packed_size
-                     (const FirmwareUpgrade__Ready *message)
-{
-  assert(message->base.descriptor == &firmware_upgrade__ready__descriptor);
-  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
-}
-size_t firmware_upgrade__ready__pack
-                     (const FirmwareUpgrade__Ready *message,
-                      uint8_t       *out)
-{
-  assert(message->base.descriptor == &firmware_upgrade__ready__descriptor);
-  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
-}
-size_t firmware_upgrade__ready__pack_to_buffer
-                     (const FirmwareUpgrade__Ready *message,
-                      ProtobufCBuffer *buffer)
-{
-  assert(message->base.descriptor == &firmware_upgrade__ready__descriptor);
-  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
-}
-FirmwareUpgrade__Ready *
-       firmware_upgrade__ready__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data)
-{
-  return (FirmwareUpgrade__Ready *)
-     protobuf_c_message_unpack (&firmware_upgrade__ready__descriptor,
-                                allocator, len, data);
-}
-void   firmware_upgrade__ready__free_unpacked
-                     (FirmwareUpgrade__Ready *message,
-                      ProtobufCAllocator *allocator)
-{
-  if(!message)
-    return;
-  assert(message->base.descriptor == &firmware_upgrade__ready__descriptor);
+  assert(message->base.descriptor == &firmware_upgrade__status__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descriptors[5] =
@@ -386,117 +296,71 @@ const ProtobufCMessageDescriptor firmware_upgrade__firmware_packet__descriptor =
   (ProtobufCMessageInit) firmware_upgrade__firmware_packet__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor firmware_upgrade__acknowledge__field_descriptors[1] =
+static const ProtobufCEnumValue firmware_upgrade__status__status_enum__enum_values_by_number[3] =
+{
+  { "READY", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY", 0 },
+  { "ACK", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__ACK", 1 },
+  { "REJECT", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__REJECT", 2 },
+};
+static const ProtobufCIntRange firmware_upgrade__status__status_enum__value_ranges[] = {
+{0, 0},{0, 3}
+};
+static const ProtobufCEnumValueIndex firmware_upgrade__status__status_enum__enum_values_by_name[3] =
+{
+  { "ACK", 1 },
+  { "READY", 0 },
+  { "REJECT", 2 },
+};
+const ProtobufCEnumDescriptor firmware_upgrade__status__status_enum__descriptor =
+{
+  PROTOBUF_C__ENUM_DESCRIPTOR_MAGIC,
+  "firmware_upgrade.status.status_enum",
+  "status_enum",
+  "FirmwareUpgrade__Status__StatusEnum",
+  "firmware_upgrade",
+  3,
+  firmware_upgrade__status__status_enum__enum_values_by_number,
+  3,
+  firmware_upgrade__status__status_enum__enum_values_by_name,
+  1,
+  firmware_upgrade__status__status_enum__value_ranges,
+  NULL,NULL,NULL,NULL   /* reserved[1234] */
+};
+static const ProtobufCFieldDescriptor firmware_upgrade__status__field_descriptors[1] =
 {
   {
-    "acknowledge",
+    "status",
     1,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_BYTES,
+    PROTOBUF_C_TYPE_ENUM,
     0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__Acknowledge, acknowledge),
-    NULL,
+    offsetof(FirmwareUpgrade__Status, status),
+    &firmware_upgrade__status__status_enum__descriptor,
     NULL,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
 };
-static const unsigned firmware_upgrade__acknowledge__field_indices_by_name[] = {
-  0,   /* field[0] = acknowledge */
+static const unsigned firmware_upgrade__status__field_indices_by_name[] = {
+  0,   /* field[0] = status */
 };
-static const ProtobufCIntRange firmware_upgrade__acknowledge__number_ranges[1 + 1] =
+static const ProtobufCIntRange firmware_upgrade__status__number_ranges[1 + 1] =
 {
   { 1, 0 },
   { 0, 1 }
 };
-const ProtobufCMessageDescriptor firmware_upgrade__acknowledge__descriptor =
+const ProtobufCMessageDescriptor firmware_upgrade__status__descriptor =
 {
   PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "firmware_upgrade.acknowledge",
-  "Acknowledge",
-  "FirmwareUpgrade__Acknowledge",
+  "firmware_upgrade.status",
+  "Status",
+  "FirmwareUpgrade__Status",
   "firmware_upgrade",
-  sizeof(FirmwareUpgrade__Acknowledge),
+  sizeof(FirmwareUpgrade__Status),
   1,
-  firmware_upgrade__acknowledge__field_descriptors,
-  firmware_upgrade__acknowledge__field_indices_by_name,
-  1,  firmware_upgrade__acknowledge__number_ranges,
-  (ProtobufCMessageInit) firmware_upgrade__acknowledge__init,
-  NULL,NULL,NULL    /* reserved[123] */
-};
-static const ProtobufCFieldDescriptor firmware_upgrade__reject__field_descriptors[1] =
-{
-  {
-    "reject",
-    1,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_BYTES,
-    0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__Reject, reject),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-};
-static const unsigned firmware_upgrade__reject__field_indices_by_name[] = {
-  0,   /* field[0] = reject */
-};
-static const ProtobufCIntRange firmware_upgrade__reject__number_ranges[1 + 1] =
-{
-  { 1, 0 },
-  { 0, 1 }
-};
-const ProtobufCMessageDescriptor firmware_upgrade__reject__descriptor =
-{
-  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "firmware_upgrade.reject",
-  "Reject",
-  "FirmwareUpgrade__Reject",
-  "firmware_upgrade",
-  sizeof(FirmwareUpgrade__Reject),
-  1,
-  firmware_upgrade__reject__field_descriptors,
-  firmware_upgrade__reject__field_indices_by_name,
-  1,  firmware_upgrade__reject__number_ranges,
-  (ProtobufCMessageInit) firmware_upgrade__reject__init,
-  NULL,NULL,NULL    /* reserved[123] */
-};
-static const ProtobufCFieldDescriptor firmware_upgrade__ready__field_descriptors[1] =
-{
-  {
-    "ready",
-    1,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_BYTES,
-    0,   /* quantifier_offset */
-    offsetof(FirmwareUpgrade__Ready, ready),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-};
-static const unsigned firmware_upgrade__ready__field_indices_by_name[] = {
-  0,   /* field[0] = ready */
-};
-static const ProtobufCIntRange firmware_upgrade__ready__number_ranges[1 + 1] =
-{
-  { 1, 0 },
-  { 0, 1 }
-};
-const ProtobufCMessageDescriptor firmware_upgrade__ready__descriptor =
-{
-  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "firmware_upgrade.ready",
-  "Ready",
-  "FirmwareUpgrade__Ready",
-  "firmware_upgrade",
-  sizeof(FirmwareUpgrade__Ready),
-  1,
-  firmware_upgrade__ready__field_descriptors,
-  firmware_upgrade__ready__field_indices_by_name,
-  1,  firmware_upgrade__ready__number_ranges,
-  (ProtobufCMessageInit) firmware_upgrade__ready__init,
+  firmware_upgrade__status__field_descriptors,
+  firmware_upgrade__status__field_indices_by_name,
+  1,  firmware_upgrade__status__number_ranges,
+  (ProtobufCMessageInit) firmware_upgrade__status__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

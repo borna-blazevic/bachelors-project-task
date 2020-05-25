@@ -17,13 +17,17 @@ PROTOBUF_C__BEGIN_DECLS
 
 typedef struct _FirmwareUpgrade__SrecLine FirmwareUpgrade__SrecLine;
 typedef struct _FirmwareUpgrade__FirmwarePacket FirmwareUpgrade__FirmwarePacket;
-typedef struct _FirmwareUpgrade__Acknowledge FirmwareUpgrade__Acknowledge;
-typedef struct _FirmwareUpgrade__Reject FirmwareUpgrade__Reject;
-typedef struct _FirmwareUpgrade__Ready FirmwareUpgrade__Ready;
+typedef struct _FirmwareUpgrade__Status FirmwareUpgrade__Status;
 
 
 /* --- enums --- */
 
+typedef enum _FirmwareUpgrade__Status__StatusEnum {
+  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY = 0,
+  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__ACK = 1,
+  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__REJECT = 2
+    PROTOBUF_C__FORCE_ENUM_TO_BE_INT_SIZE(FIRMWARE_UPGRADE__STATUS__STATUS_ENUM)
+} FirmwareUpgrade__Status__StatusEnum;
 
 /* --- messages --- */
 
@@ -53,34 +57,14 @@ struct  _FirmwareUpgrade__FirmwarePacket
     , 0, NULL, {0,NULL} }
 
 
-struct  _FirmwareUpgrade__Acknowledge
+struct  _FirmwareUpgrade__Status
 {
   ProtobufCMessage base;
-  ProtobufCBinaryData acknowledge;
+  FirmwareUpgrade__Status__StatusEnum status;
 };
-#define FIRMWARE_UPGRADE__ACKNOWLEDGE__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&firmware_upgrade__acknowledge__descriptor) \
-    , {0,NULL} }
-
-
-struct  _FirmwareUpgrade__Reject
-{
-  ProtobufCMessage base;
-  ProtobufCBinaryData reject;
-};
-#define FIRMWARE_UPGRADE__REJECT__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&firmware_upgrade__reject__descriptor) \
-    , {0,NULL} }
-
-
-struct  _FirmwareUpgrade__Ready
-{
-  ProtobufCMessage base;
-  ProtobufCBinaryData ready;
-};
-#define FIRMWARE_UPGRADE__READY__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&firmware_upgrade__ready__descriptor) \
-    , {0,NULL} }
+#define FIRMWARE_UPGRADE__STATUS__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&firmware_upgrade__status__descriptor) \
+    , FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY }
 
 
 /* FirmwareUpgrade__SrecLine methods */
@@ -121,62 +105,24 @@ FirmwareUpgrade__FirmwarePacket *
 void   firmware_upgrade__firmware_packet__free_unpacked
                      (FirmwareUpgrade__FirmwarePacket *message,
                       ProtobufCAllocator *allocator);
-/* FirmwareUpgrade__Acknowledge methods */
-void   firmware_upgrade__acknowledge__init
-                     (FirmwareUpgrade__Acknowledge         *message);
-size_t firmware_upgrade__acknowledge__get_packed_size
-                     (const FirmwareUpgrade__Acknowledge   *message);
-size_t firmware_upgrade__acknowledge__pack
-                     (const FirmwareUpgrade__Acknowledge   *message,
+/* FirmwareUpgrade__Status methods */
+void   firmware_upgrade__status__init
+                     (FirmwareUpgrade__Status         *message);
+size_t firmware_upgrade__status__get_packed_size
+                     (const FirmwareUpgrade__Status   *message);
+size_t firmware_upgrade__status__pack
+                     (const FirmwareUpgrade__Status   *message,
                       uint8_t             *out);
-size_t firmware_upgrade__acknowledge__pack_to_buffer
-                     (const FirmwareUpgrade__Acknowledge   *message,
+size_t firmware_upgrade__status__pack_to_buffer
+                     (const FirmwareUpgrade__Status   *message,
                       ProtobufCBuffer     *buffer);
-FirmwareUpgrade__Acknowledge *
-       firmware_upgrade__acknowledge__unpack
+FirmwareUpgrade__Status *
+       firmware_upgrade__status__unpack
                      (ProtobufCAllocator  *allocator,
                       size_t               len,
                       const uint8_t       *data);
-void   firmware_upgrade__acknowledge__free_unpacked
-                     (FirmwareUpgrade__Acknowledge *message,
-                      ProtobufCAllocator *allocator);
-/* FirmwareUpgrade__Reject methods */
-void   firmware_upgrade__reject__init
-                     (FirmwareUpgrade__Reject         *message);
-size_t firmware_upgrade__reject__get_packed_size
-                     (const FirmwareUpgrade__Reject   *message);
-size_t firmware_upgrade__reject__pack
-                     (const FirmwareUpgrade__Reject   *message,
-                      uint8_t             *out);
-size_t firmware_upgrade__reject__pack_to_buffer
-                     (const FirmwareUpgrade__Reject   *message,
-                      ProtobufCBuffer     *buffer);
-FirmwareUpgrade__Reject *
-       firmware_upgrade__reject__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data);
-void   firmware_upgrade__reject__free_unpacked
-                     (FirmwareUpgrade__Reject *message,
-                      ProtobufCAllocator *allocator);
-/* FirmwareUpgrade__Ready methods */
-void   firmware_upgrade__ready__init
-                     (FirmwareUpgrade__Ready         *message);
-size_t firmware_upgrade__ready__get_packed_size
-                     (const FirmwareUpgrade__Ready   *message);
-size_t firmware_upgrade__ready__pack
-                     (const FirmwareUpgrade__Ready   *message,
-                      uint8_t             *out);
-size_t firmware_upgrade__ready__pack_to_buffer
-                     (const FirmwareUpgrade__Ready   *message,
-                      ProtobufCBuffer     *buffer);
-FirmwareUpgrade__Ready *
-       firmware_upgrade__ready__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data);
-void   firmware_upgrade__ready__free_unpacked
-                     (FirmwareUpgrade__Ready *message,
+void   firmware_upgrade__status__free_unpacked
+                     (FirmwareUpgrade__Status *message,
                       ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
@@ -186,14 +132,8 @@ typedef void (*FirmwareUpgrade__SrecLine_Closure)
 typedef void (*FirmwareUpgrade__FirmwarePacket_Closure)
                  (const FirmwareUpgrade__FirmwarePacket *message,
                   void *closure_data);
-typedef void (*FirmwareUpgrade__Acknowledge_Closure)
-                 (const FirmwareUpgrade__Acknowledge *message,
-                  void *closure_data);
-typedef void (*FirmwareUpgrade__Reject_Closure)
-                 (const FirmwareUpgrade__Reject *message,
-                  void *closure_data);
-typedef void (*FirmwareUpgrade__Ready_Closure)
-                 (const FirmwareUpgrade__Ready *message,
+typedef void (*FirmwareUpgrade__Status_Closure)
+                 (const FirmwareUpgrade__Status *message,
                   void *closure_data);
 
 /* --- services --- */
@@ -203,9 +143,8 @@ typedef void (*FirmwareUpgrade__Ready_Closure)
 
 extern const ProtobufCMessageDescriptor firmware_upgrade__srec_line__descriptor;
 extern const ProtobufCMessageDescriptor firmware_upgrade__firmware_packet__descriptor;
-extern const ProtobufCMessageDescriptor firmware_upgrade__acknowledge__descriptor;
-extern const ProtobufCMessageDescriptor firmware_upgrade__reject__descriptor;
-extern const ProtobufCMessageDescriptor firmware_upgrade__ready__descriptor;
+extern const ProtobufCMessageDescriptor firmware_upgrade__status__descriptor;
+extern const ProtobufCEnumDescriptor    firmware_upgrade__status__status_enum__descriptor;
 
 PROTOBUF_C__END_DECLS
 
