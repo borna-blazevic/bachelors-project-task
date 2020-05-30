@@ -23,9 +23,10 @@ typedef struct _FirmwareUpgrade__Status FirmwareUpgrade__Status;
 /* --- enums --- */
 
 typedef enum _FirmwareUpgrade__Status__StatusEnum {
-  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY = 0,
-  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__ACK = 1,
-  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__REJECT = 2
+  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__UNUSED = 0,
+  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY = 1,
+  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__ACK = 2,
+  FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__REJECT = 3
     PROTOBUF_C__FORCE_ENUM_TO_BE_INT_SIZE(FIRMWARE_UPGRADE__STATUS__STATUS_ENUM)
 } FirmwareUpgrade__Status__StatusEnum;
 
@@ -36,7 +37,7 @@ struct  _FirmwareUpgrade__SrecLine
   ProtobufCMessage base;
   char *record_type;
   uint32_t byte_count;
-  int32_t address;
+  uint32_t address;
   ProtobufCBinaryData data;
   uint32_t checksum;
 };
@@ -63,7 +64,7 @@ struct  _FirmwareUpgrade__Status
 };
 #define FIRMWARE_UPGRADE__STATUS__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&firmware_upgrade__status__descriptor) \
-    , FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY }
+    , FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__UNUSED }
 
 
 /* FirmwareUpgrade__SrecLine methods */

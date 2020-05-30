@@ -160,7 +160,7 @@ static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descrip
     "byte_count",
     2,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_UINT32,
+    PROTOBUF_C_TYPE_FIXED32,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__SrecLine, byte_count),
     NULL,
@@ -172,7 +172,7 @@ static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descrip
     "address",
     3,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_INT32,
+    PROTOBUF_C_TYPE_FIXED32,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__SrecLine, address),
     NULL,
@@ -196,7 +196,7 @@ static const ProtobufCFieldDescriptor firmware_upgrade__srec_line__field_descrip
     "checksum",
     5,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_UINT32,
+    PROTOBUF_C_TYPE_FIXED32,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__SrecLine, checksum),
     NULL,
@@ -238,7 +238,7 @@ static const ProtobufCFieldDescriptor firmware_upgrade__firmware_packet__field_d
     "checksum",
     1,
     PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_UINT32,
+    PROTOBUF_C_TYPE_FIXED32,
     0,   /* quantifier_offset */
     offsetof(FirmwareUpgrade__FirmwarePacket, checksum),
     NULL,
@@ -283,20 +283,22 @@ const ProtobufCMessageDescriptor firmware_upgrade__firmware_packet__descriptor =
   (ProtobufCMessageInit) firmware_upgrade__firmware_packet__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCEnumValue firmware_upgrade__status__status_enum__enum_values_by_number[3] =
+static const ProtobufCEnumValue firmware_upgrade__status__status_enum__enum_values_by_number[4] =
 {
-  { "READY", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY", 0 },
-  { "ACK", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__ACK", 1 },
-  { "REJECT", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__REJECT", 2 },
+  { "UNUSED", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__UNUSED", 0 },
+  { "READY", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__READY", 1 },
+  { "ACK", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__ACK", 2 },
+  { "REJECT", "FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__REJECT", 3 },
 };
 static const ProtobufCIntRange firmware_upgrade__status__status_enum__value_ranges[] = {
-{0, 0},{0, 3}
+{0, 0},{0, 4}
 };
-static const ProtobufCEnumValueIndex firmware_upgrade__status__status_enum__enum_values_by_name[3] =
+static const ProtobufCEnumValueIndex firmware_upgrade__status__status_enum__enum_values_by_name[4] =
 {
-  { "ACK", 1 },
-  { "READY", 0 },
-  { "REJECT", 2 },
+  { "ACK", 2 },
+  { "READY", 1 },
+  { "REJECT", 3 },
+  { "UNUSED", 0 },
 };
 const ProtobufCEnumDescriptor firmware_upgrade__status__status_enum__descriptor =
 {
@@ -305,9 +307,9 @@ const ProtobufCEnumDescriptor firmware_upgrade__status__status_enum__descriptor 
   "status_enum",
   "FirmwareUpgrade__Status__StatusEnum",
   "firmware_upgrade",
-  3,
+  4,
   firmware_upgrade__status__status_enum__enum_values_by_number,
-  3,
+  4,
   firmware_upgrade__status__status_enum__enum_values_by_name,
   1,
   firmware_upgrade__status__status_enum__value_ranges,
