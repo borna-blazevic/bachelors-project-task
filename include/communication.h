@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#define MAX_MSG_SIZE (500)
+
 void print_string(char *mes);
 void print_uint32(uint32_t *mes);
 void print_uint8(uint8_t *mes);

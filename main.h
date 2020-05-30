@@ -8,5 +8,7 @@
 #include <gpio.h>
 #include <communication.h>
 #include <memory_config.h>
+#include <checksum.h>
+#include <firmware_upgrade.h>
 
 #endif
