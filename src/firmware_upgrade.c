@@ -26,7 +26,6 @@ void send_status_packet(int status_type)
 		status.status = FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__REJECT;
 		break;
 	}
-	status.status = FIRMWARE_UPGRADE__STATUS__STATUS_ENUM__ACK;
 	packet_size = firmware_upgrade__status__get_packed_size(&status);
 	firmware_upgrade__status__pack(&status, message_buffer);
 	message_buffer[packet_size] = '\0';

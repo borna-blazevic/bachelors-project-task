@@ -11,21 +11,23 @@ static void firmware_upgrade_task(void *pvParameters);
 int main(void)
 {
 	uint32_t *bootenv = &_shared;
+	uint32_t secret;
+	bootenv[0]=2;
+	bootenv[1]=0;
+	bootenv[2]=2;
+	bootenv[3]=1;
+	bootenv[4]=0;
+	bootenv[5]=0;
+	secret = bootenv[6];
 
 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x20000);
 	prvSetupHardware();
 
 	/* Start the Tx of the message on the UART. */
 
-	if (*bootenv == 2)
-	{
-		print_string("\nbooted task and restarting\n");
-		*bootenv = 3;
-		NVIC_SystemReset();
-	}
 	print_string("\nbooted task and upgrading\n");
 
-	xTaskCreate(firmware_upgrade_task, "firmware_upgrade_task", 10000, NULL, 5, NULL);
+	xTaskCreate(firmware_upgrade_task, "firmware_upgrade_task", 16348, NULL, 7, NULL);
 	xTaskCreate(blinky_task, "blinky_task", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 	vTaskStartScheduler();
 }
@@ -34,11 +36,14 @@ static void blinky_task(void *pvParameters)
 {
 	uint32_t led_state;
 	led_state = 1; // ON
+	uint32_t *bootenv = &_shared;
 	while (1)
 	{
+		bootenv[1] = bootenv[1] | 1;
 		gpio_led_state(LED4_GREEN_ID, led_state);
 		led_state = (led_state == 1) ? 0 : 1;
 		vTaskDelay(100 / portTICK_RATE_MS); // LED blinking frequency
+		bootenv[1] = bootenv[1] & 0xfffffffe;
 	}
 }
 
@@ -53,16 +58,14 @@ static void firmware_upgrade_task(void *pvParameters)
 	send_status_packet(1);
 	while (1)
 	{
+		bootenv[1] = bootenv[1] | 2;
 		do
 		{
 			vTaskDelay(10 / portTICK_RATE_MS); // LED blinking frequency
 			r = recieve_data_packet(&packet);
 			if (r == -1)
 				send_status_packet(1);
-			else
-				break;
-		} while (1);
-
+		} while (r == -1);
 		if (r == 0)
 		{
 			send_status_packet(3);
@@ -97,11 +100,11 @@ static void firmware_upgrade_task(void *pvParameters)
 			continue;
 		}
 		free_data_packet(packet);
-		bootenv[50] = write_data(pImage, packet);
+		bootenv[5] = write_data(pImage, packet);
 		send_status_packet(2);
+		bootenv[1] = bootenv[1] & 0xfffffffd;
 	}
-	bootenv[55] = 1;
-	*bootenv = 2;
+	bootenv[4] = 1;
 	NVIC_SystemReset();
 }
 

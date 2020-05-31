@@ -2,7 +2,7 @@
 #ifndef USART_H
 #define USART_H
 
-#define BUFSIZE 256
+#define BUFSIZE 64
 #define BAUDRATE 115200
 
 void USART1_Init(void);       // init USART1 peripheral

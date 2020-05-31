@@ -12,6 +12,9 @@ int check_data_packet_checksum(const void *packet)
 	uint32_t helper_mask[4] = {0xff, 0xff00, 0xff0000, 0xff000000};
 	uint32_t checksum;
 
+	if(_packet->line->data.len == _packet->line->address && _packet->line->data.len == _packet->line->byte_count )
+		return 0;
+
 	checksum32_data[0] = (0xff00 & (_packet->line->record_type[0] << 8)) | (0xff & _packet->line->record_type[1]);
 	checksum32_data[1] = _packet->line->byte_count;
 	checksum32_data[2] = _packet->line->address;
