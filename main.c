@@ -1,15 +1,16 @@
 /* main.c */
 #include "main.h"
 #include <string.h>
-
+#include <FreeRTOS.h>
+#include <task.h>
 
 static void prvSetupHardware(void);
+static void blinky_task(void *pvParameters);
+static void firmware_upgrade_task(void *pvParameters);
 
 int main(void)
 {
-	uint8_t *pImage = &_firmware_upgrade;
 	uint32_t *bootenv = &_shared;
-	void *packet;
 
 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x20000);
 	prvSetupHardware();
@@ -24,12 +25,45 @@ int main(void)
 	}
 	print_string("\nbooted task and upgrading\n");
 
-	bootenv[55] = 0;
-	send_status_packet(1);
+	xTaskCreate(firmware_upgrade_task, "firmware_upgrade_task", 10000, NULL, 5, NULL);
+	xTaskCreate(blinky_task, "blinky_task", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+	vTaskStartScheduler();
+}
 
+static void blinky_task(void *pvParameters)
+{
+	uint32_t led_state;
+	led_state = 1; // ON
 	while (1)
 	{
-		if (!recieve_data_packet(&packet))
+		gpio_led_state(LED4_GREEN_ID, led_state);
+		led_state = (led_state == 1) ? 0 : 1;
+		vTaskDelay(100 / portTICK_RATE_MS); // LED blinking frequency
+	}
+}
+
+static void firmware_upgrade_task(void *pvParameters)
+{
+	void *packet;
+	int r;
+	uint32_t *bootenv = &_shared;
+	uint8_t *pImage = &_firmware_upgrade;
+	bootenv[55] = 0;
+	uint32_t led_state = 1; // ON
+	send_status_packet(1);
+	while (1)
+	{
+		do
+		{
+			vTaskDelay(10 / portTICK_RATE_MS); // LED blinking frequency
+			r = recieve_data_packet(&packet);
+			if (r == -1)
+				send_status_packet(1);
+			else
+				break;
+		} while (1);
+
+		if (r == 0)
 		{
 			send_status_packet(3);
 			continue;
@@ -37,12 +71,14 @@ int main(void)
 
 		if (!check_data_packet_checksum(packet))
 		{
+			free_data_packet(packet);
 			send_status_packet(3);
 			continue;
 		}
 
 		if (!check_srec_line_checksum(packet))
 		{
+			free_data_packet(packet);
 			send_status_packet(3);
 			continue;
 		}
@@ -53,6 +89,7 @@ int main(void)
 			send_status_packet(2);
 			break;
 		}
+
 		if (!check_data_packet_type(packet, "S0"))
 		{
 			free_data_packet(packet);
@@ -79,5 +116,3 @@ void HardFault_Handler(void)
 {
 	NVIC_SystemReset();
 }
-
-

@@ -60,17 +60,22 @@ int read_uint8(uint8_t *mes)
 int read_packet(uint8_t *mes, uint8_t *packet_size)
 {
 
-    uint8_t i = 0; 
-    if(read_uint8(packet_size))
+    uint8_t i = 0, j = 0;
+    if (read_uint8(packet_size))
         return -1;
-    
 
     while (i < *packet_size)
     {
-        if(read_uint8(mes))
+        if (read_uint8(mes))
+        {
+            j++;
+            if (j >= 3)
+                return -1;
             continue;
+        }
         i++;
         mes++;
+        j = 0;
     }
     return 0;
 }

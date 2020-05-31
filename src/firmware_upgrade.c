@@ -1,9 +1,9 @@
 
-
 #include <firmware_package.pb-c.h>
 #include <protobuf-c.h>
 #include <stdint.h>
 #include <communication.h>
+#include <string.h>
 
 void send_status_packet(int status_type)
 {
@@ -38,8 +38,8 @@ int recieve_data_packet(void **ret_packet)
 	FirmwareUpgrade__FirmwarePacket *packet;
 	uint8_t packet_size;
 	uint8_t message_buffer[MAX_MSG_SIZE];
-	while (read_packet(message_buffer, &packet_size))
-		;
+	if (read_packet(message_buffer, &packet_size))
+		return -1;
 
 	packet = firmware_upgrade__firmware_packet__unpack(NULL, packet_size * sizeof(char), message_buffer);
 
