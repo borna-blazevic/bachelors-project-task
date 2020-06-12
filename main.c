@@ -11,21 +11,19 @@ static void firmware_upgrade_task(void *pvParameters);
 int main(void)
 {
 	uint32_t *bootenv = &_shared;
-	uint32_t secret;
 	bootenv[0]=2;
 	bootenv[1]=0;
 	bootenv[2]=2;
 	bootenv[3]=1;
 	bootenv[4]=0;
 	bootenv[5]=0;
-	secret = bootenv[6];
 
 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x20000);
 	prvSetupHardware();
 
 	/* Start the Tx of the message on the UART. */
 
-	print_string("\nbooted task and upgrading\n");
+	print_string("\nBooted recovery image\n");
 
 	xTaskCreate(firmware_upgrade_task, "firmware_upgrade_task", 16348, NULL, 7, NULL);
 	xTaskCreate(blinky_task, "blinky_task", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
@@ -53,8 +51,8 @@ static void firmware_upgrade_task(void *pvParameters)
 	int r;
 	uint32_t *bootenv = &_shared;
 	uint8_t *pImage = &_firmware_upgrade;
-	bootenv[55] = 0;
-	uint32_t led_state = 1; // ON
+	uint32_t secret;
+	secret = bootenv[6];
 	send_status_packet(1);
 	while (1)
 	{
@@ -72,7 +70,7 @@ static void firmware_upgrade_task(void *pvParameters)
 			continue;
 		}
 
-		if (!check_data_packet_checksum(packet))
+		if (!check_data_packet_checksum(packet, secret))
 		{
 			free_data_packet(packet);
 			send_status_packet(3);

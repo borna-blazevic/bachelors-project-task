@@ -29,7 +29,7 @@ void send_status_packet(int status_type)
 	packet_size = firmware_upgrade__status__get_packed_size(&status);
 	firmware_upgrade__status__pack(&status, message_buffer);
 	message_buffer[packet_size] = '\0';
-	print_string(message_buffer);
+	print_string((char *)message_buffer);
 	print_string("\n");
 }
 int recieve_data_packet(void **ret_packet)

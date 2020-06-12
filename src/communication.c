@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <usart.h>
 #include <gpio.h>
+#include <communication.h>
 
 void print_uint32(uint32_t *mes)
 {
@@ -61,10 +62,10 @@ int read_packet(uint8_t *mes, uint8_t *packet_size)
 {
 
     uint8_t i = 0, j = 0;
-    if (read_uint8(packet_size))
+    if (read_uint8(packet_size) || *packet_size == 0)
         return -1;
 
-    while (i < *packet_size)
+    while (i < *packet_size && i<MAX_MSG_SIZE)
     {
         if (read_uint8(mes))
         {
